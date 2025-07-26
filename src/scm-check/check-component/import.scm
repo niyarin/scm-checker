@@ -1,5 +1,6 @@
 (define-library (scm-check check-component import)
   (import (scheme base)
+          (scheme write)
           (only (srfi 1) fold)
           (prefix (scm-check code-warning) w/)
           (prefix (scm-check reader) schk-rdr/))
@@ -17,7 +18,7 @@
         (lambda (code* debug-info* accum)
           (let* ((library-name (import-set->library-name code*))
                  (appended-import
-                  (cons code* (car accum))))
+                  (cons library-name (car accum))))
             (if (member library-name (car accum))
               (list appended-import
                     (cons (w/make-code-warning debug-info*
