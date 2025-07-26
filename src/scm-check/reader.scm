@@ -66,6 +66,17 @@
                    (+ (ref-col position) 1)
                    (reverse debug-info)))))
 
+      (define (%handle-pair pair position)
+        (let* ((first (construct-code (car pair) (position-inc-col position)))
+               (next-pos (if (list? first) (cadr first) first))
+               (tail (construct-code (cdr pair) next-pos)))
+          (if (list? first)
+            (list (cons (car first)
+                        (car tail))
+                  (position-inc-col (cadr tail))
+                  position)
+            tail)))
+
       (define (construct-code icode position)
         ;; return (constructed object, new-position, current position)
         ;;        IF icode is code element ELSE new-position
@@ -76,6 +87,9 @@
             (make-position (position->filename position)
                            (+ (ref-line position) 1)
                            0))
+          ((and (srdr/lexical? icode) (eq? (srdr/lexical-type icode) 'DOT-PAIR))
+            (%handle-pair (srdr/lexical-data icode) position))
+
           ((symbol? icode)
            (list icode
                  (position-append-col position (string-length (symbol->string icode)))
@@ -86,6 +100,7 @@
                  (position-append-col position 3)
                  position))
           ((list? icode) (%handle-list icode position))
+          ((pair? icode) (%handle-pair icode position))
 
           ((number? icode)
            (list icode
