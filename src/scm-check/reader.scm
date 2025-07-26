@@ -90,6 +90,16 @@
           ((and (srdr/lexical? icode) (eq? (srdr/lexical-type icode) 'DOT-PAIR))
             (%handle-pair (srdr/lexical-data icode) position))
 
+
+          ((and (srdr/lexical? icode) (eq? (srdr/lexical-type icode) 'ATOM))
+           (list (srdr/lexical-origin icode)
+                 (position-append-col position (string-length (srdr/lexical-origin icode)))
+                 position))
+
+          ;((and (srdr/lexical? icode))
+          ; (display (srdr/lexical-type icode))(newline)
+          ; (write (srdr/lexical-origin icode))(newline))
+
           ((symbol? icode)
            (list icode
                  (position-append-col position (string-length (symbol->string icode)))
@@ -132,6 +142,6 @@
                       (values (reverse constructed-list)
                               (reverse debug-info-list))
                       (loop (cons (car constructed) constructed-list)
-                            position
+                            new-position
                             (cons (car (ref-children debug-info))
                                   debug-info-list))))))))))))
