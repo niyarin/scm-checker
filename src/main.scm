@@ -3,7 +3,8 @@
    (include "scheme-reader/scheme-reader/core.scm")
    (include "scm-check/reader.scm")
    (include "scm-check/code-warning.scm")
-   (include "scm-check/check-component/import.scm"))
+   (include "scm-check/check-component/import.scm")
+   (include "scm-check/check-component/cond.scm"))
   (else))
 
 (import (scheme base)
@@ -13,13 +14,16 @@
         (only (srfi 1) append-map)
         (prefix (scm-check reader) schk-rdr/)
         (prefix (scm-check code-warning) w/)
-        (prefix (scm-check check-component import) chk-import/))
+        (prefix (scm-check check-component import) chk-import/)
+        (prefix (scm-check check-component cond) chk-cond/))
 
 (define (check-code code debug-info)
   (cond
     ((not (list? code)) '())
     ((eq? (car code) 'import)
      (chk-import/check-import code debug-info) )
+    ((eq? (car code) 'cond)
+     (chk-cond/check-cond code debug-info) )
     (else '())))
 
 (define (check-file filename)
