@@ -19,7 +19,7 @@
           (boolean? object)))
 
     ;;TODO: Support non symbol data.
-    (define (check-symbol-eq-clause clause)
+    (define (check-atom-eq-clause clause)
       (let* ((test (car clause))
              (test-ope (and (list? test) (car test))))
         (or (and (eq? test-ope 'zero?)
@@ -31,14 +31,12 @@
                      (eq? test-ope '=))
                  (or (and (or (quote-symbol-expression? (cadr test))
                               (atom-except-identifier? (cadr test)))
-                          (symbol? (list-ref test 2))
                           (cons (list-ref test 2)
                                 (if (quote-symbol-expression? (cadr test))
                                   (cadr (cadr test))
                                   (cadr test))))
                      (and (or (quote-symbol-expression? (list-ref test 2))
                               (atom-except-identifier? (list-ref test 2)))
-                          (symbol? (cadr test))
                           (cons (cadr test)
                                 (if (quote-symbol-expression? (list-ref test 2))
                                   (cadr (list-ref test 2))
@@ -56,14 +54,14 @@
           (let loop ((ls* (cdr ls)))
             (cond
               ((null? ls*) #t)
-              ((eq? (car ls*) (car ls))
+              ((equal? (car ls*) (car ls))
                (loop (cdr ls*)))
               (else #f)))))
 
     (define (check-cond->case-pattern code debug-info)
       (let* ((clauses (cdr code)))
         (if (every simple-clause? clauses)
-          (let ((check-res (map check-symbol-eq-clause
+          (let ((check-res (map check-atom-eq-clause
                                  (remove else-clause? clauses))))
             (if (and (not (any (lambda (x) (eq? x #f)) check-res))
                      (all-same? (map car check-res)))
