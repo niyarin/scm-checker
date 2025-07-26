@@ -16,8 +16,9 @@
     ;;TODO: Support non symbol data.
     (define (check-symbol-eq-clause clause)
       (let* ((test (car clause))
-             (test-ope (car test)))
-        (and (or (eq? test-ope 'eq?)
+             (test-ope (and (list? test) (car test))))
+        (and test-ope
+             (or (eq? test-ope 'eq?)
                  (eq? test-ope 'eqv?)
                  (eq? test-ope 'equal?))
              (or (and (quote-expression? (cadr test))
