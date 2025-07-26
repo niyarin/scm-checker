@@ -1,10 +1,15 @@
+(cond-expand
+  (chicken
+   (include "scheme-reader/scheme-reader/core.scm")
+   (include "scm-check/reader.scm")))
+
 (import (scheme base)
         (scheme write)
         (scheme file)
         (scheme process-context)
-        (only (scheme list) fold append-map)
-        (prefix (scm-check reader) schk-rdr/)
-        )
+        ;(only (scheme list) fold append-map)
+        (srfi 1)
+        (prefix (scm-check reader) schk-rdr/))
 
 (define-record-type <code-warning>
   (make-code-warning pos message)

@@ -3,9 +3,10 @@
           (scheme write)
           (scheme file)
           (scheme process-context)
-          (only (scheme list) fold last)
+          ;(only (scheme list) fold last)
+          (only (srfi 1) fold last)
           (prefix (scheme-reader core) srdr/))
-  (export read-super position->pair (rename ref-children position-children))
+  (export read-super position->pair position-children)
   (begin
     (define-record-type <position>
       (make-position* line col children)
@@ -13,6 +14,8 @@
       (line ref-line)
       (col ref-col)
       (children ref-children))
+
+    (define position-children ref-children)
 
     (define (make-position line col)
       (make-position* line col #f))
