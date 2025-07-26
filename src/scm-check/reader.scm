@@ -6,32 +6,34 @@
           ;(only (scheme list) fold last)
           (only (srfi 1) fold last)
           (prefix (scheme-reader core) srdr/))
-  (export read-super position->pair position-children)
+  (export read-super position->pair position-children position->filename)
   (begin
     (define-record-type <position>
-      (make-position* line col children)
+      (make-position* filename line col children)
       position?
+      (filename position->filename)
       (line ref-line)
       (col ref-col)
       (children ref-children))
 
     (define position-children ref-children)
 
-    (define (make-position line col)
-      (make-position* line col #f))
+    (define (make-position filename line col)
+      (make-position* filename line col #f))
 
     (define (position->pair position)
       (cons (ref-line position)
             (ref-col position)))
 
     (define (position-append-col pos col-diff)
-      (make-position (ref-line pos)
+      (make-position (position->filename pos)
+                     (ref-line pos)
                      (+ (ref-col pos) col-diff)))
 
     (define (position-inc-col pos)
       (position-append-col pos 1))
 
-    (define initial-position (make-position 1 1))
+    (define (initial-position filename) (make-position* filename 1 1 '()))
 
     (define-syntax let-list
       (syntax-rules ()
@@ -59,6 +61,7 @@
            (list (reverse reversed-ls)
                  (position-inc-col pos)
                  (make-position*
+                   (position->filename position)
                    (ref-line position)
                    (+ (ref-col position) 1)
                    (reverse debug-info)))))
@@ -70,7 +73,8 @@
           ((and (srdr/lexical? icode) (eq? (srdr/lexical-type icode) 'SPACE))
            (position-append-col position 1))
           ((and (srdr/lexical? icode) (eq? (srdr/lexical-type icode) 'NEWLINE))
-            (make-position (+ (ref-line position) 1)
+            (make-position (position->filename position)
+                           (+ (ref-line position) 1)
                            0))
           ((symbol? icode)
            (list icode
@@ -103,7 +107,7 @@
         (call-with-input-file
           filename
           (lambda (port)
-            (let ((position initial-position))
+            (let ((position (initial-position filename)))
               (let loop ((constructed-list '())
                          (position position)
                          (debug-info-list '()))
