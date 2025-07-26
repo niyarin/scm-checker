@@ -1,7 +1,8 @@
 (cond-expand
   (chicken
    (include "scheme-reader/scheme-reader/core.scm")
-   (include "scm-check/reader.scm")))
+   (include "scm-check/reader.scm"))
+  (else))
 
 (import (scheme base)
         (scheme write)
