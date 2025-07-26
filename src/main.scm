@@ -17,13 +17,26 @@
         (prefix (scm-check check-component import) chk-import/)
         (prefix (scm-check check-component cond) chk-cond/))
 
+(define (handle-list code debug-info)
+  (let ((debug-info-list* (schk-rdr/position-children debug-info)))
+    (append-map
+      (lambda (code* debug-info*) (check-code code* debug-info*))
+        code
+        debug-info-list*)))
+
 (define (check-code code debug-info)
   (cond
     ((not (list? code)) '())
+    ((null? code) '())
     ((eq? (car code) 'import)
      (chk-import/check-import code debug-info) )
     ((eq? (car code) 'cond)
-     (chk-cond/check-cond code debug-info) )
+     (append (chk-cond/check-cond code debug-info)
+             (handle-list code debug-info)))
+    ((eq? (car code) 'quote)
+      '())
+    ((list? code)
+     (handle-list code debug-info))
     (else '())))
 
 (define (check-file filename)
