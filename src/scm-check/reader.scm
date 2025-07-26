@@ -87,8 +87,12 @@
             (make-position (position->filename position)
                            (+ (ref-line position) 1)
                            0))
+
           ((and (srdr/lexical? icode) (eq? (srdr/lexical-type icode) 'DOT-PAIR))
-            (%handle-pair (srdr/lexical-data icode) position))
+           (let ((l (%handle-list (srdr/lexical-data icode) (position-append-col position 3))))
+             (list (caar l)
+                   (cadr l)
+                   (list-ref l 2))))
 
           ((and (srdr/lexical? icode) (eq? (srdr/lexical-type icode) 'COMMENT))
             (position-append-col position
@@ -99,9 +103,9 @@
                  (position-append-col position (string-length (srdr/lexical-origin icode)))
                  position))
 
-          ((and (srdr/lexical? icode))
-           (display (srdr/lexical-type icode))(newline)
-           (write (srdr/lexical-origin icode))(newline))
+          ;((and (srdr/lexical? icode))
+          ; (display (srdr/lexical-type icode))(newline)
+          ; (write (srdr/lexical-origin icode))(newline))
 
           ((symbol? icode)
            (list icode
@@ -112,7 +116,8 @@
             (list icode
                  (position-append-col position 3)
                  position))
-          ((list? icode) (%handle-list icode position))
+          ((list? icode)
+           (%handle-list icode position))
           ((pair? icode) (%handle-pair icode position))
 
           ((number? icode)
