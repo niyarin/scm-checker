@@ -16,6 +16,7 @@
 
     (define (atom-except-identifier? object)
       (or (integer? object)
+          (char? object)
           (boolean? object)))
 
     ;;TODO: Support non symbol data.
@@ -27,8 +28,9 @@
             (and test-ope
                  (or (eq? test-ope 'eq?)
                      (eq? test-ope 'eqv?)
-                     (eq? test-ope 'equal?)
-                     (eq? test-ope '=))
+                     (eq? test-ope '=)
+                     (eq? test-ope 'boolean=?)
+                     (eq? test-ope 'char=?))
                  (or (and (or (quote-symbol-expression? (cadr test))
                               (atom-except-identifier? (cadr test)))
                           (cons (list-ref test 2)
