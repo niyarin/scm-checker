@@ -18,10 +18,17 @@
   (pos ref-pos)
   (message ref-message))
 
+(define (import-set->library-name import-set)
+  (if (list? import-set)
+    (case (car import-set)
+      ((only except prefix rename) (import-set->library-name (cadr import-set)))
+      (else import-set))
+    import-set))
+
 (define (check-import* code debug-info)
   (fold
     (lambda (code* debug-info* accum)
-      (let* ((library-name code*)
+      (let* ((library-name (import-set->library-name code*))
              (appended-import
               (cons code* (car accum))))
         (if (member library-name (car accum))
@@ -35,7 +42,6 @@
           '());;error
     (cdr code)
     (cdr (schk-rdr/position-children debug-info))))
-
 
 (define (check-import code debug-info)
   (cadr (check-import* code debug-info)))
