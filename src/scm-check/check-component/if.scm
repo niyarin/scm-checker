@@ -6,13 +6,30 @@
           (prefix (scm-check reader) schk-rdr/))
   (export check-if)
   (begin
+    (define (always-true-if-case? expression)
+      (and (eq? (cadr expression) #t)))
+
+    (define (always-false-if-case? expression)
+      (and (eq? (cadr expression) #f)))
+
     (define (use-and-case? expression)
       (and (= (length expression) 4)
            (eq? (list-ref expression 3) #f)))
 
+    (define (valid-if? expression)
+      (and (list? expression)
+           (or (= (length expression) 3)
+               (= (length expression) 4))))
+
     (define (check-if expression debug-info)
       (cond
+        ((not (valid-if? expression))
+         ;;TODO: This should be error.(not warning)
+          (list (w/make-code-warning debug-info "Invalid if.")))
         ((use-and-case? expression)
           (list (w/make-code-warning debug-info "Use and.")))
-        (else
-          '())))))
+        ((always-true-if-case? expression)
+          (list (w/make-code-warning debug-info "Test is always true.")))
+        ((always-false-if-case? expression)
+          (list (w/make-code-warning debug-info "Test is always false.")))
+        (else '())))))

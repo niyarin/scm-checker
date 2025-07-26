@@ -4,6 +4,7 @@
    (include "scm-check/reader.scm")
    (include "scm-check/code-warning.scm")
    (include "scm-check/check-component/import.scm")
+   (include "scm-check/check-component/if.scm")
    (include "scm-check/check-component/cond.scm"))
   (else))
 
@@ -15,6 +16,7 @@
         (prefix (scm-check reader) schk-rdr/)
         (prefix (scm-check code-warning) w/)
         (prefix (scm-check check-component import) chk-import/)
+        (prefix (scm-check check-component if) chk-if/)
         (prefix (scm-check check-component cond) chk-cond/))
 
 (define (handle-list code debug-info)
@@ -32,6 +34,9 @@
      (chk-import/check-import code debug-info) )
     ((eq? (car code) 'cond)
      (append (chk-cond/check-cond code debug-info)
+             (handle-list code debug-info)))
+    ((eq? (car code) 'if)
+     (append (chk-if/check-if code debug-info)
              (handle-list code debug-info)))
     ((eq? (car code) 'quote)
       '())

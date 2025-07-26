@@ -30,6 +30,11 @@
                      (ref-line pos)
                      (+ (ref-col pos) col-diff)))
 
+    (define (position-newline pos)
+      (make-position (position->filename pos)
+                     (+ (ref-line pos) 1)
+                     1))
+
     (define (position-inc-col pos)
       (position-append-col pos 1))
 
@@ -95,8 +100,7 @@
                    (list-ref l 2))))
 
           ((and (srdr/lexical? icode) (eq? (srdr/lexical-type icode) 'COMMENT))
-            (position-append-col position
-                                 (+ 1 (string-length (srdr/lexical-data icode)))))
+            (position-newline position))
 
           ((and (srdr/lexical? icode) (eq? (srdr/lexical-type icode) 'ATOM))
            (list (srdr/lexical-data icode)
