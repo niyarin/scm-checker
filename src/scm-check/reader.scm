@@ -99,7 +99,7 @@
                                  (+ 1 (string-length (srdr/lexical-data icode)))))
 
           ((and (srdr/lexical? icode) (eq? (srdr/lexical-type icode) 'ATOM))
-           (list (srdr/lexical-origin icode)
+           (list (srdr/lexical-data icode)
                  (position-append-col position (string-length (srdr/lexical-origin icode)))
                  position))
 
