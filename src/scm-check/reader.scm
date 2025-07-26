@@ -90,15 +90,18 @@
           ((and (srdr/lexical? icode) (eq? (srdr/lexical-type icode) 'DOT-PAIR))
             (%handle-pair (srdr/lexical-data icode) position))
 
+          ((and (srdr/lexical? icode) (eq? (srdr/lexical-type icode) 'COMMENT))
+            (position-append-col position
+                                 (+ 1 (string-length (srdr/lexical-data icode)))))
 
           ((and (srdr/lexical? icode) (eq? (srdr/lexical-type icode) 'ATOM))
            (list (srdr/lexical-origin icode)
                  (position-append-col position (string-length (srdr/lexical-origin icode)))
                  position))
 
-          ;((and (srdr/lexical? icode))
-          ; (display (srdr/lexical-type icode))(newline)
-          ; (write (srdr/lexical-origin icode))(newline))
+          ((and (srdr/lexical? icode))
+           (display (srdr/lexical-type icode))(newline)
+           (write (srdr/lexical-origin icode))(newline))
 
           ((symbol? icode)
            (list icode
