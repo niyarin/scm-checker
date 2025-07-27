@@ -21,6 +21,11 @@
            (or (= (length expression) 3)
                (= (length expression) 4))))
 
+    (define (nest-if-case? expression)
+      (and (= (length expression) 4)
+           (list? (list-ref expression 3))
+           (eq? (car (list-ref expression 3)) 'if)))
+
     (define (check-if expression debug-info)
       (cond
         ((not (valid-if? expression))
@@ -32,4 +37,6 @@
           (list (w/make-code-warning debug-info "Test is always true.")))
         ((always-false-if-case? expression)
           (list (w/make-code-warning debug-info "Test is always false.")))
+        ((nest-if-case? expression)
+         (list (w/make-code-warning debug-info "Use cond")))
         (else '())))))
