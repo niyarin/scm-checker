@@ -51,6 +51,16 @@
       code
       debug-info)))
 
+(define (check-stdin)
+  (let loop ((position (schk-rdr/initial-position "-")))
+    (let ((constructed-list (schk-rdr/read-list1 (current-input-port) position)))
+      (unless (null? (car constructed-list))
+        (for-each
+          print-warn
+          (check-code (caar constructed-list)
+                      (car (schk-rdr/position-children (list-ref constructed-list 2)))))
+        (loop (cadr constructed-list))))))
+
 (define (print-warn warn)
   (let ((pos-pair (schk-rdr/position->pair (w/code-warning->pos warn)))
         (filename (schk-rdr/position->filename (w/code-warning->pos warn))))
@@ -67,9 +77,12 @@
 
 (define (main)
   (let ((args (command-line)))
-    (when (>= (length args) 2)
-      (for-each
-        print-warn
-        (check-file (cadr args))))))
-
+    (when (= (length args) 2)
+      (cond
+        ((string=? (cadr args) "-")
+         (check-stdin))
+        (else
+          (for-each
+            print-warn
+            (check-file (cadr args))))))))
 (main)

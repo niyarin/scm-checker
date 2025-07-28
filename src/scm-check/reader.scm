@@ -6,7 +6,8 @@
           ;(only (scheme list) fold last)
           (only (srfi 1) fold last)
           (prefix (scheme-reader core) srdr/))
-  (export read-super position->pair position-children position->filename)
+  (export read-super position->pair position-children position->filename read-list1
+          initial-position)
   (begin
     (define-record-type <position>
       (make-position* filename line col children)
@@ -140,6 +141,10 @@
             (write icode)
             (newline))))
 
+      (define (read-list1 port position)
+        (let ((code (srdr/read-internal port)))
+          (%handle-list code position)))
+
       (define (read-super filename)
         (call-with-input-file
           filename
@@ -148,12 +153,11 @@
               (let loop ((constructed-list '())
                          (position position)
                          (debug-info-list '()))
-                (let ((code (srdr/read-internal port)))
-                  (let-list (( (constructed new-position debug-info) (%handle-list code position)))
-                    (if (null? constructed)
-                      (values (reverse constructed-list)
-                              (reverse debug-info-list))
-                      (loop (cons (car constructed) constructed-list)
-                            new-position
-                            (cons (car (ref-children debug-info))
-                                  debug-info-list))))))))))))
+                (let-list (( (constructed new-position debug-info) (read-list1 port position)))
+                  (if (null? constructed)
+                    (values (reverse constructed-list)
+                            (reverse debug-info-list))
+                    (loop (cons (car constructed) constructed-list)
+                          new-position
+                          (cons (car (ref-children debug-info))
+                                debug-info-list)))))))))))
