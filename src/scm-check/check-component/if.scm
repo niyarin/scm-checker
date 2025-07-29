@@ -7,7 +7,9 @@
   (export check-if)
   (begin
     (define (always-true-if-case? expression)
-      (and (eq? (cadr expression) #t)))
+      (or (eq? (cadr expression) #t)
+          (number? (cadr expression))
+          (char? (cadr expression))))
 
     (define (always-false-if-case? expression)
       (and (eq? (cadr expression) #f)))
@@ -32,11 +34,22 @@
          ;;TODO: This should be error.(not warning)
           (list (w/make-code-warning debug-info "Invalid if.")))
         ((use-and-case? expression)
-          (list (w/make-code-warning debug-info "Use and.")))
+          (list (w/make-code-warning-with-suggestion
+                  debug-info
+                  "Use and."
+                  expression
+                  `((and ,(cadr expression)
+                         ,(list-ref expression 2))))))
         ((always-true-if-case? expression)
-          (list (w/make-code-warning debug-info "Test is always true.")))
+          (list (w/make-code-warning-with-suggestion
+                  debug-info "Test is always true."
+                  expression
+                  `(,(list-ref expression 2)))))
         ((always-false-if-case? expression)
-          (list (w/make-code-warning debug-info "Test is always false.")))
+          (list (w/make-code-warning-with-suggestion
+                  debug-info "Test is always false."
+                  expression
+                  `(,(list-ref expression 3)))))
         ((nest-if-case? expression)
          (list (w/make-code-warning debug-info "Use cond")))
         (else '())))))

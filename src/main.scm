@@ -51,7 +51,7 @@
       code
       debug-info)))
 
-(define (check-stdin)
+(define (check-stdin output-format)
   (let loop ((position (schk-rdr/initial-position "-")))
     (let ((constructed-list (schk-rdr/read-list1 (current-input-port) position)))
       (unless (null? (car constructed-list))
@@ -61,7 +61,7 @@
                       (car (schk-rdr/position-children (list-ref constructed-list 2)))))
         (loop (cadr constructed-list))))))
 
-(define (print-warn warn)
+(define (print-warn warn output-format)
   (let ((pos-pair (schk-rdr/position->pair (w/code-warning->pos warn)))
         (filename (schk-rdr/position->filename (w/code-warning->pos warn))))
     (display filename)
@@ -73,16 +73,42 @@
     (display "W")
     (display ":")
     (display (w/code-warning->message warn))
-    (newline)))
+    (newline)
+    (when (and (w/code-warning->suggestion warn)
+               (eq? output-format 'LONG))
+      (write (w/code-warning->code warn))
+      (display " =>")
+      (newline)
+
+      (for-each (lambda (x) (write x)) (w/code-warning->suggestion warn))
+      (newline))))
+
+(define (simple-optparse args)
+  (let loop ((args* (cdr args))
+             (filename "-")
+             (output-format 'SHORT))
+    (cond
+      ((null? args*) (values filename output-format))
+      ((string=? (car args*) "--short-output")
+       (loop (cdr args*) filename 'SHORT))
+      ((string=? (car args*) "--long-output")
+       (loop (cdr args*) filename 'LONG))
+      (else (loop (cdr args*) (car args*) output-format)))))
+
+(define (print-help)
+  (display "Usage: Scm-checker <file>")(newline)
+  (display "If <file> is '-', This software reads from standard input.")(newline)
+  (display "Options:")(newline)
+  (display "--short-output: Output simple comment.")(newline)
+  (display "--long-output: Output comment and suggestion.")(newline))
 
 (define (main)
   (let ((args (command-line)))
-    (when (= (length args) 2)
-      (cond
-        ((string=? (cadr args) "-")
-         (check-stdin))
-        (else
-          (for-each
-            print-warn
-            (check-file (cadr args))))))))
+    (if (null? (cdr args))
+      (print-help)
+      (let-values (((filename output-format) (simple-optparse args)))
+        (if (string=? filename "-")
+          (check-stdin output-format)
+          (for-each (lambda (warn) (print-warn warn output-format))
+                    (check-file filename)))))))
 (main)

@@ -21,8 +21,8 @@
                   (cons library-name (car accum))))
             (if (member library-name (car accum))
               (list appended-import
-                    (cons (w/make-code-warning debug-info*
-                                               "Duplicate import.")
+                    (cons (w/make-code-warning-with-suggestion
+                            debug-info* "Duplicate import." (car accum) '())
                           (cadr accum)))
               (list appended-import
                     (cadr accum)))))
