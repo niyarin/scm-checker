@@ -2,8 +2,7 @@
   (import (scheme base)
           (scheme write)
           (only (srfi 1) every any remove)
-          (prefix (scm-check code-warning) w/)
-          (prefix (scm-check reader) schk-rdr/))
+          (prefix (scm-check code-warning) w/))
   (export check-if)
   (begin
     (define (always-true-if-case? expression)
