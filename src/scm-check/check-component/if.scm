@@ -18,6 +18,9 @@
       (and (= (length expression) 4)
            (eq? (list-ref expression 3) #f)))
 
+    (define (use-when-case? expression)
+      (= (length expression) 3))
+
     (define (valid-if? expression)
       (and (list? expression)
            (or (= (length expression) 3)
@@ -40,6 +43,13 @@
                   expression
                   `((and ,(cadr expression)
                          ,(list-ref expression 2))))))
+        ((use-when-case? expression)
+          (list (w/make-code-warning-with-suggestion
+                  debug-info
+                  "Use when."
+                  expression
+                  `((when ,(cadr expression)
+                          ,(list-ref expression 2))))))
         ((always-true-if-case? expression)
           (list (w/make-code-warning-with-suggestion
                   debug-info "Test is always true."
