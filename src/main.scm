@@ -6,53 +6,23 @@
    (include "scm-check/check-component/import.scm")
    (include "scm-check/check-component/if.scm")
    (include "scm-check/check-component/cond.scm")
-   (include "scm-check/check-component/and.scm"))
+   (include "scm-check/check-component/and.scm")
+   (include "scm-check/checkers.scm"))
   (else))
 
 (import (scheme base)
         (scheme write)
         (scheme file)
-        (scheme process-context)
+        (prefix (scm-check code-warning) w/)
         (only (srfi 1) append-map)
         (prefix (scm-check reader) schk-rdr/)
-        (prefix (scm-check code-warning) w/)
-        (prefix (scm-check check-component import) chk-import/)
-        (prefix (scm-check check-component if) chk-if/)
-        (prefix (scm-check check-component cond) chk-cond/)
-        (prefix (scm-check check-component and) chk-and/))
-
-(define (handle-list code debug-info)
-  (let ((debug-info-list* (schk-rdr/position-children debug-info)))
-    (append-map
-      (lambda (code* debug-info*) (check-code code* debug-info*))
-        code
-        debug-info-list*)))
-
-(define (check-code code debug-info)
-  (cond
-    ((not (list? code)) '())
-    ((null? code) '())
-    ((eq? (car code) 'import)
-     (chk-import/check-import code debug-info) )
-    ((eq? (car code) 'cond)
-     (append (chk-cond/check-cond code debug-info)
-             (handle-list code debug-info)))
-    ((eq? (car code) 'if)
-     (append (chk-if/check-if code debug-info)
-             (handle-list code debug-info)))
-    ((eq? (car code) 'and)
-      (append (chk-and/check-and code debug-info)
-              (handle-list code debug-info)))
-    ((eq? (car code) 'quote)
-      '())
-    ((list? code)
-     (handle-list code debug-info))
-    (else '())))
+        (prefix (scm-check checkers) checkers/)
+        (scheme process-context))
 
 (define (check-file filename)
   (let-values (((code debug-info) (schk-rdr/read-super filename)))
     (append-map
-      check-code
+      checkers/check-code
       code
       debug-info)))
 
@@ -62,8 +32,9 @@
       (unless (null? (car constructed-list))
         (for-each
           print-warn
-          (check-code (caar constructed-list)
-                      (car (schk-rdr/position-children (list-ref constructed-list 2)))))
+          (checkers/check-code
+            (caar constructed-list)
+            (car (schk-rdr/position-children (list-ref constructed-list 2)))))
         (loop (cadr constructed-list))))))
 
 (define (print-warn warn output-format)
