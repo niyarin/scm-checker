@@ -17,5 +17,6 @@ gosh -I ./src -I ./src/scheme-reader/ src/main.scm test-resources/source1.scm
 ```bash
 git submodule update --init
 chicken-install r7rs
+chicken-install srfi-113
 make
 ```
