@@ -3,7 +3,7 @@
           (only (scheme write) write display)
           (only (srfi 1) append-map filter-map)
           (prefix (srfi 113) set/)
-          (prefix (srfi 128) comparator/)
+          (prefix (scm-check common) common/)
           (prefix (scm-check reader) schk-rdr/)
           (prefix (scm-check code-warning) w/)
           (prefix (scm-check check-component import) chk-import/)
@@ -28,12 +28,11 @@
     (define (begin-library-declaration? expression)
       (eq? (car expression) 'begin))
 
-    (define eq-comparator (comparator/make-eq-comparator))
-    (define empty-eq-set (set/set eq-comparator))
+    (define empty-eq-set (set/set common/eq-comparator))
 
     (define (get-identifiers code)
       (cond
-        ((symbol? code) (set/set eq-comparator code))
+        ((symbol? code) (set/set common/eq-comparator code))
         ((and (list? code)
               (map get-identifiers code))
          =>
@@ -71,7 +70,10 @@
                (chk-import/simple-library-check x debug-info used-identifiers))
                (cdr (car (car imports)))
                (cdr (schk-rdr/position-children  (cdr (car imports)))))
-            '()))))
+            '())
+          (append-map (lambda (x debug-info*) (check-code x debug-info*))
+                      (map car begins)
+                      (map cdr begins)))))
 
     (define (check-code code debug-info)
       (cond
