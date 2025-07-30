@@ -20,3 +20,9 @@ chicken-install r7rs
 chicken-install srfi-113
 make
 ```
+
+## Vim integration
+You can use this software with [dense-analysis/ale](https://github.com/dense-analysis/ale) in Vim for on-the-fly linting.
+Just use it together with the provided config file:  misc/ale_linters/scm_checker.vim
+Copy it to your ALE linters directory or load it via your Vim config.
+Make sure the compiled binary of this software is placed somewhere in your $PATH, so ALE can invoke it properly.
