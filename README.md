@@ -22,7 +22,7 @@ make
 ```
 
 ## Usage Extensions
-### Vim integration
+### Vim
 You can use this software with [dense-analysis/ale](https://github.com/dense-analysis/ale) in Vim for on-the-fly linting.
 Just use it together with the provided config file:  [misc/ale_linters/scm_checker.vim](https://github.com/niyarin/scm-checker/blob/main/misc/ale_linters/scm_checker.vim)
 Copy it to your ALE linters directory or load it via your Vim config.
