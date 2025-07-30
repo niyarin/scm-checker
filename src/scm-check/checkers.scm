@@ -9,6 +9,7 @@
           (prefix (scm-check check-component import) chk-import/)
           (prefix (scm-check check-component if) chk-if/)
           (prefix (scm-check check-component cond) chk-cond/)
+          (prefix (scm-check check-component let) chk-let/)
           (prefix (scm-check check-component and) chk-and/))
   (export check-code)
   (begin
@@ -83,6 +84,9 @@
          (chk-import/check-import code debug-info) )
         ((eq? (car code) 'cond)
          (append (chk-cond/check-cond code debug-info)
+                 (handle-list code debug-info)))
+        ((eq? (car code) 'let)
+         (append (chk-let/check-let code debug-info)
                  (handle-list code debug-info)))
         ((eq? (car code) 'define-library)
          (handle-r7rs-library code debug-info))

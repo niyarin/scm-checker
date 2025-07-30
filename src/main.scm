@@ -8,6 +8,7 @@
    (include "scm-check/check-component/if.scm")
    (include "scm-check/check-component/cond.scm")
    (include "scm-check/check-component/and.scm")
+   (include "scm-check/check-component/let.scm")
    (include "scm-check/checkers.scm"))
   (else))
 
