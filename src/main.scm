@@ -9,6 +9,7 @@
    (include "scm-check/check-component/cond.scm")
    (include "scm-check/check-component/and.scm")
    (include "scm-check/check-component/let.scm")
+   (include "scm-check/check-component/arithmetic.scm")
    (include "scm-check/checkers.scm"))
   (else))
 

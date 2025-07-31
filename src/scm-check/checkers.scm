@@ -10,6 +10,7 @@
           (prefix (scm-check check-component if) chk-if/)
           (prefix (scm-check check-component cond) chk-cond/)
           (prefix (scm-check check-component let) chk-let/)
+          (prefix (scm-check check-component arithmetic) chk-arithmetic/)
           (prefix (scm-check check-component and) chk-and/))
   (export check-code)
   (begin
@@ -90,6 +91,8 @@
                  (handle-list code debug-info)))
         ((eq? (car code) 'define-library)
          (handle-r7rs-library code debug-info))
+        ((eq? (car code) '=)
+         (chk-arithmetic/check-= code debug-info))
         ((eq? (car code) 'if)
          (append (chk-if/check-if code debug-info)
                  (handle-list code debug-info)))
