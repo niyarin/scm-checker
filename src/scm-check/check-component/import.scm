@@ -2,8 +2,7 @@
   (import (scheme base)
           (scheme write)
           (only (srfi 1) fold filter)
-          (prefix (srfi 113) set/)
-          (prefix (scm-check common) common/)
+          (prefix (scm-check adapter set) set/)
           (prefix (scm-check code-warning) w/)
           (prefix (scm-check reader) schk-rdr/))
   (export check-import simple-library-check )
@@ -45,11 +44,11 @@
       ;;TODO: WIP
       (let* ((import-identifiers
               (import-declaration->import-identifiers import-clause))
-             (used (set/set-intersection (set/list->set common/eq-comparator import-identifiers)
+             (used (set/intersection (set/list->eq-set common/eq-comparator import-identifiers)
                                          used-identifiers)))
 
         (and (not (null? import-identifiers))
-             (not (set/set-empty? used))
+             (not (set/empty? used))
              used)))
 
 
@@ -57,7 +56,7 @@
       (cond
         ((eq? (car import-declaration) 'only)
          (let* ((import-identifiers (import-declaration->import-identifiers import-declaration))
-                (unused-import (filter (lambda (x) (and (not (set/set-contains? used-identifiers x)) x)) import-identifiers)))
+                (unused-import (filter (lambda (x) (and (not (set/contains? used-identifiers x)) x)) import-identifiers)))
           (if (null? unused-import)
             (list)
             (list (w/make-code-warning

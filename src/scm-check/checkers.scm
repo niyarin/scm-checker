@@ -2,8 +2,7 @@
   (import (scheme base)
           (only (scheme write) write display)
           (only (srfi 1) append-map filter-map)
-          (prefix (srfi 113) set/)
-          (prefix (scm-check common) common/)
+          (prefix (scm-check adapter set) set/)
           (prefix (scm-check reader) schk-rdr/)
           (prefix (scm-check code-warning) w/)
           (prefix (scm-check check-component import) chk-import/)
@@ -30,17 +29,17 @@
     (define (begin-library-declaration? expression)
       (eq? (car expression) 'begin))
 
-    (define empty-eq-set (set/set common/eq-comparator))
+    (define empty-eq-set (set/make-set-eq))
 
     (define (get-identifiers code)
       (cond
-        ((symbol? code) (set/set common/eq-comparator code))
+        ((symbol? code) (set/make-set-eq))
         ((and (list? code)
               (map get-identifiers code))
          =>
          (lambda (identifiers-list)
            (if (>= (length identifiers-list) 1)
-             (apply set/set-union identifiers-list)
+             (apply set/union identifiers-list)
              empty-eq-set)))
         (else empty-eq-set)))
 

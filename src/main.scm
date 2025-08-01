@@ -1,6 +1,6 @@
 (cond-expand
   (chicken
-   (include "scm-check/common.scm")
+   (include "scm-check/adapter/set.scm")
    (include "scheme-reader/scheme-reader/core.scm")
    (include "scm-check/reader.scm")
    (include "scm-check/code-warning.scm")
