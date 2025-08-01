@@ -4,7 +4,7 @@
           (scheme file)
           (scheme process-context)
           ;(only (scheme list) fold last)
-          (only (srfi 1) fold last)
+          (only (srfi 1) fold)
           (prefix (scheme-reader core) srdr/))
   (export read-super position->pair position-children position->filename read-list1
           initial-position)

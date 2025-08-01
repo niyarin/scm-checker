@@ -1,7 +1,5 @@
 (define-library (scm-check check-component and)
   (import (scheme base)
-          (scheme write)
-          (only (srfi 1) every any remove)
           (prefix (scm-check code-warning) w/)
           (prefix (scm-check reader) schk-rdr/))
   (export check-and)
