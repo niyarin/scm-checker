@@ -1,6 +1,5 @@
 (define-library (scm-checker checkers)
   (import (scheme base)
-          (only (scheme write) write display)
           (only (srfi 1) append-map filter-map any)
           (prefix (scm-checker config) config/)
           (prefix (scm-checker adapter set) set/)
