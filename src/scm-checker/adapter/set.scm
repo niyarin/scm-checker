@@ -6,13 +6,19 @@
               (prefix (srfi 113) set/)
               (prefix (srfi 128) comparator/))
       (export make-set-eq
-              (rename set/set-intersection intersection)
               list->eq-set
               eq-set->list
-              (rename set/set-empty? empty?)
-              (rename set/union union)
-              (rename set/set-contains? contains?))
+              ;(rename set/set-intersection intersection)
+              ;(rename set/set-empty? empty?)
+              ;(rename set/set-union union)
+              ;(rename set/set-contains? contains?)
+              intersection empty? contains? union)
       (begin
+        (define intersection set/set-intersection)
+        (define union set/set-union)
+        (define contains? set/set-contains?)
+        (define empty? set/set-empty?)
+
         (define eq-comparator (comparator/make-eq-comparator))
         (define (list->eq-set ls)
           (set/list->set eq-comparator ls))
