@@ -92,6 +92,8 @@
          (handle-r7rs-library code debug-info))
         ((eq? (car code) '=)
          (chk-arithmetic/check-= code debug-info))
+        ((eq? (car code) '>)
+         (chk-arithmetic/check-> code debug-info))
         ((eq? (car code) 'if)
          (append (chk-if/check-if code debug-info)
                  (handle-list code debug-info)))
