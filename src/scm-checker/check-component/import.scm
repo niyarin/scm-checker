@@ -44,7 +44,7 @@
       ;;TODO: WIP
       (let* ((import-identifiers
               (import-declaration->import-identifiers import-clause))
-             (used (set/intersection (set/list->eq-set common/eq-comparator import-identifiers)
+             (used (set/intersection (set/list->eq-set import-identifiers)
                                          used-identifiers)))
 
         (and (not (null? import-identifiers))

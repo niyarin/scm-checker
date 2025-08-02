@@ -1,7 +1,7 @@
 (define-library (scm-checker adapter set)
   ;; Adapter for Scheme implementations that do not support SRFI 113 (scheme set).
   (cond-expand
-    (srfi-113
+    ((or srfi-113 chicken)
       (import (scheme base)
               (prefix (srfi 113) set/)
               (prefix (srfi 128) comparator/))
@@ -22,6 +22,11 @@
         (define eq-comparator (comparator/make-eq-comparator))
         (define (list->eq-set ls)
           (set/list->set eq-comparator ls))
+
+        (define (eq-set->list set)
+          (set/set->list set))
+
+
         (define (make-set-eq . args)
           (apply set/set
                  eq-comparator
@@ -53,4 +58,4 @@
          (apply lset-union eq? args))
 
        (define (contains? st elem)
-         (and (memq st elem st) #t))))))
+         (and (memq elem st) #t))))))
