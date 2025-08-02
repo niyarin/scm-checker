@@ -1,8 +1,10 @@
 (define-library (scm-checker match core)
   (import (scheme base)
+          (scheme write)
           (only (srfi 1) fold)
           (prefix (scm-checker adapter box) box/))
-  (export make-variable match make-bindings construct)
+  (export make-variable match make-bindings construct
+          var1 var2 var3 var4)
   (begin
     ;;TODO: Support ellipsis pattern.
 
@@ -17,6 +19,11 @@
 
       (%make-variable (string->symbol
                         (string-append "v" (number->string *cnt*)))))
+
+    (define var1 (make-variable))
+    (define var2 (make-variable))
+    (define var3 (make-variable))
+    (define var4 (make-variable))
 
     (define (make-bindings)
       (box/box '()))
@@ -40,6 +47,7 @@
          (and (list? input)
               (= (length language) (length input))
               (fold (lambda (v1 v2 accm)
+                      (display (vector v1 v2))(newline)
                       (and accm (%match v1 v2 bindings)))
                     #t
                     language
@@ -69,23 +77,3 @@
          (cons (construct (car language) bindings)
                (construct (cdr language) bindings)))
         (else language)))))
-
-(define-syntax comment
-  (syntax-rules ()
-    ((_ x ...) '())))
-(comment
-  (import (scheme base) (scm-checker match core) (scheme write) )
-  (let* ((bindings (make-bindings))
-         (v1 (make-variable))
-         (v2 (make-variable))
-         (res
-            (match (list 1 v1 v2 4)
-                   '(1 2 3 4)
-                   bindings)))
-        (write
-          (construct
-            `(cons ,v1 ,v2)
-            bindings))
-        (newline)
-        )
-  )
