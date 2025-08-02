@@ -1,6 +1,5 @@
 (define-library (scm-check check-component cond)
   (import (scheme base)
-          (scheme write)
           (only (srfi 1) every any remove find)
           (prefix (scm-check code-warning) w/)
           (prefix (scm-check reader) schk-rdr/))
@@ -62,28 +61,29 @@
                (loop (cdr ls*)))
               (else #f)))))
 
-    (define (make-case-expression check-res else-expression)
-      `((case (,(caar check-res))
+    (define (make-case-expression eq-clauses else-expression)
+      `((case (,(caar eq-clauses))
         ,@(map (lambda (x) (list (list (cadr x))
                                  (list-ref x 2)))
-              check-res)
+              eq-clauses)
         ,@(if else-expression (list else-expression) '()))))
 
     (define (check-cond->case-pattern code debug-info)
       (let* ((clauses (cdr code)))
-        (if (every simple-clause? clauses)
-          (let ((check-res (map check-atom-eq-clause
-                                 (remove else-clause? clauses))))
-            (if (and (not (any (lambda (x) (eq? x #f)) check-res))
-                     (all-same? (map car check-res)))
-              (w/make-code-warning-with-suggestion
-                  debug-info "Use case."
-                  code
-                  (make-case-expression
-                    check-res
-                    (find else-clause? clauses)))
-              #f))
-          #f)))
+        (cond
+          ((and (every simple-clause? clauses)
+                (map check-atom-eq-clause
+                     (remove else-clause? clauses)))
+           => (lambda (eq-clauses)
+                (and (not (any (lambda (x) (eq? x #f)) eq-clauses))
+                     (all-same? (map car eq-clauses))
+                     (w/make-code-warning-with-suggestion
+                        debug-info "Use case."
+                        code
+                        (make-case-expression
+                          eq-clauses
+                          (find else-clause? clauses))))))
+          (else #f))))
 
     (define (check-cond code debug-info)
       (let ((resp (check-cond->case-pattern code debug-info)))
