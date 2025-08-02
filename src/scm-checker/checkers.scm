@@ -35,7 +35,8 @@
 
     (define (get-identifiers code)
       (cond
-        ((symbol? code) (set/make-set-eq))
+        ((symbol? code)
+         (set/make-set-eq code))
         ((and (list? code)
               (map get-identifiers code))
          =>
@@ -63,7 +64,6 @@
                        declarations
                        debug-infos))
              (used-identifiers (get-identifiers (map car begins))))
-
         (append
           (if (>= (length imports) 2)
             (list (w/make-code-warning (cdr (cadr imports)) "Duplicate import."))
