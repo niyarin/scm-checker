@@ -29,7 +29,7 @@
                  #t)
           (equal? val (cdr exists-cell)))))
 
-    (define (match language input bindings)
+    (define (%match language input bindings)
       (cond
         ((variable? language)
          (check-and-bind language input bindings))
@@ -40,15 +40,21 @@
          (and (list? input)
               (= (length language) (length input))
               (fold (lambda (v1 v2 accm)
-                      (and accm (match v1 v2 bindings)))
+                      (and accm (%match v1 v2 bindings)))
                     #t
                     language
                     input)))
         ((pair? language)
          (and (pair? input)
-              (match (car language) (car input) bindings)
-              (match (cdr language) (cdr input) bindings)))
+              (%match (car language) (car input) bindings)
+              (%match (cdr language) (cdr input) bindings)))
         (else (eqv? language input))))
+
+    (define (match language input . opt)
+      ;;TODO: Use case lambda
+      (let ((bindings (if (null? opt) (make-bindings) (car opt))))
+        (and (%match  language input bindings)
+             bindings)))
 
     (define (ref-bindings bindings var)
       (cond
