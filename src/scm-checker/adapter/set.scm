@@ -42,7 +42,7 @@
        (define (eq-set->list x) x)
 
        (define (list->eq-set ls)
-         (delete-dulicates ls eq?))
+         (delete-duplicates ls eq?))
 
        (define empty? null?)
 
