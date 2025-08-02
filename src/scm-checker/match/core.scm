@@ -1,9 +1,9 @@
 (define-library (scm-checker match core)
   (import (scheme base)
-          (scheme write)
           (only (srfi 1) fold)
           (prefix (scm-checker adapter box) box/))
   (export make-variable match make-bindings construct
+          ref-bindings
           var1 var2 var3 var4)
   (begin
     ;;TODO: Support ellipsis pattern.
@@ -47,7 +47,6 @@
          (and (list? input)
               (= (length language) (length input))
               (fold (lambda (v1 v2 accm)
-                      (display (vector v1 v2))(newline)
                       (and accm (%match v1 v2 bindings)))
                     #t
                     language

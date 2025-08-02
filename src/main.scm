@@ -2,6 +2,7 @@
   (chicken
    (include "scm-checker/adapter/set.scm")
    (include "scm-checker/adapter/box.scm")
+   (include "scm-checker/utils.scm")
    (include "scm-checker/match/core.scm")
    (include "scheme-reader/scheme-reader/core.scm")
    (include "scm-checker/config.scm")

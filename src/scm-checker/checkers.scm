@@ -2,8 +2,8 @@
   (import (scheme base)
           (only (srfi 1) append-map filter-map any)
           (prefix (scm-checker config) config/)
-          (prefix (scm-checker adapter set) set/)
           (prefix (scm-checker reader) schk-rdr/)
+          (prefix (scm-checker utils) utils/)
           (prefix (scm-checker code-warning) w/)
           (prefix (scm-checker check-component import) chk-import/)
           (prefix (scm-checker check-component if) chk-if/)
@@ -30,21 +30,6 @@
     (define (begin-library-declaration? expression)
       (eq? (car expression) 'begin))
 
-    (define empty-eq-set (set/make-set-eq))
-
-    (define (get-identifiers code)
-      (cond
-        ((symbol? code)
-         (set/make-set-eq code))
-        ((and (list? code)
-              (map get-identifiers code))
-         =>
-         (lambda (identifiers-list)
-           (if (>= (length identifiers-list) 1)
-             (apply set/union identifiers-list)
-             empty-eq-set)))
-        (else empty-eq-set)))
-
     (define (filter-with-debug-info pred ls debug-infos)
       (filter-map
         (lambda (v debug-info*) (and (pred v) (cons v debug-info*)))
@@ -62,7 +47,7 @@
                        begin-library-declaration?
                        declarations
                        debug-infos))
-             (used-identifiers (get-identifiers (map car begins))))
+             (used-identifiers (utils/get-identifiers (map car begins))))
         (append
           (if (>= (length imports) 2)
             (list (w/make-code-warning (cdr (cadr imports)) "Duplicate import."))
