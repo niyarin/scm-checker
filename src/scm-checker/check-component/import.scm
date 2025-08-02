@@ -5,7 +5,7 @@
           (prefix (scm-checker adapter set) set/)
           (prefix (scm-checker code-warning) w/)
           (prefix (scm-checker reader) schk-rdr/))
-  (export check-import simple-library-check )
+  (export check-import simple-library-check used-library-namd?)
   (begin
     (define (import-set->library-name import-set)
       (if (list? import-set)
@@ -97,4 +97,14 @@
         (cdr (schk-rdr/position-children debug-info))))
 
     (define (check-import code debug-info)
-      (cadr (check-import* code debug-info)))))
+      (cadr (check-import* code debug-info)))
+
+    (define (import-set->library-name import-set)
+      (let loop ((import-set* import-set))
+        (case (car import-set*)
+          ((only except prefix rename)
+           (loop (cadr import-set*)))
+          (else import-set*))))
+
+    (define (used-library-namd? import-set library-name)
+      (equal? (import-set->library-name import-set) library-name))))
