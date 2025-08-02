@@ -1,8 +1,8 @@
-(define-library (scm-check check-component let)
+(define-library (scm-checker check-component let)
   (import (scheme base)
           (only (srfi 1) every)
-          (prefix (scm-check code-warning) w/)
-          (prefix (scm-check reader) schk-rdr/))
+          (prefix (scm-checker code-warning) w/)
+          (prefix (scm-checker reader) schk-rdr/))
   (export check-let)
   (begin
     (define (%binding? ls)

@@ -1,8 +1,8 @@
-(define-library (scm-check check-component cond)
+(define-library (scm-checker check-component cond)
   (import (scheme base)
           (only (srfi 1) every any remove find)
-          (prefix (scm-check code-warning) w/)
-          (prefix (scm-check reader) schk-rdr/))
+          (prefix (scm-checker code-warning) w/)
+          (prefix (scm-checker reader) schk-rdr/))
   (export check-cond)
   (begin
     (define (else-clause? clause)

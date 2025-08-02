@@ -1,4 +1,4 @@
-(define-library (scm-check reader)
+(define-library (scm-checker reader)
   (import (scheme base)
           (scheme write)
           (scheme file)

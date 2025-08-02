@@ -1,8 +1,8 @@
-(define-library (scm-check check-component if)
+(define-library (scm-checker check-component if)
   (import (scheme base)
           (scheme write)
           (only (srfi 1) every any remove)
-          (prefix (scm-check code-warning) w/))
+          (prefix (scm-checker code-warning) w/))
   (export check-if)
   (begin
     (define (always-true-if-case? expression)

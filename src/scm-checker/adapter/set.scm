@@ -1,4 +1,4 @@
-(define-library (scm-check adapter set)
+(define-library (scm-checker adapter set)
   ;; Adapter for Scheme implementations that do not support SRFI 113 (scheme set).
   (cond-expand
     (srfi-113

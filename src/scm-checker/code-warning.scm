@@ -1,4 +1,4 @@
-(define-library (scm-check code-warning)
+(define-library (scm-checker code-warning)
   (import (scheme base))
   (export make-code-warning code-warning->pos code-warning->message code-warning->suggestion
           code-warning->code

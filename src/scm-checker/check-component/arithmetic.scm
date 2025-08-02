@@ -1,7 +1,7 @@
-(define-library (scm-check check-component arithmetic)
+(define-library (scm-checker check-component arithmetic)
   (import (scheme base)
-          (prefix (scm-check code-warning) w/)
-          (prefix (scm-check reader) schk-rdr/))
+          (prefix (scm-checker code-warning) w/)
+          (prefix (scm-checker reader) schk-rdr/))
   (export check-=)
   (begin
     (define (check-use-zero-case expression)
