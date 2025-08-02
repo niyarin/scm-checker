@@ -85,8 +85,47 @@
                           (find else-clause? clauses))))))
           (else #f))))
 
+    (define (%tail2 ls)
+      (let loop ((res1 #f)
+                 (res2 #f)
+                 (reverse-head '())
+                 (ls ls))
+        (if (null? ls)
+          (values res1 res2
+                  (cond
+                    ((null? reverse-head) reverse-head)
+                    ((null? (cdr reverse-head)) (cdr reverse-head))
+                    (else (cddr reverse-head))))
+          (loop res2
+                (car ls)
+                (cons (car ls) reverse-head)
+                (cdr ls)))))
+
+    (define (check-merged-boolean-pattern code)
+      (let-values (((clause1 clause2 reverse-head) (%tail2 code)))
+        (cond
+          ((not
+             (and (else-clause? clause2)
+                  (= (length clause1) 2)
+                  (= (length clause2) 2)))
+           #f)
+          ((and (eq? (cadr clause1) #t)
+                (eq? (cadr clause2) #f))
+           (reverse (cons `(else ,(car clause1)) reverse-head)))
+          ((and (eq? (cadr clause1) #f)
+                (eq? (cadr clause2) #t))
+           (reverse (cons `(else (not ,(car clause1))) reverse-head)))
+          (else #f))))
+
     (define (check-cond code debug-info)
-      (let ((resp (check-cond->case-pattern code debug-info)))
-        (if resp
-          (list resp)
-          '())))))
+      (cond
+        ((check-cond->case-pattern code debug-info)
+         => (lambda (resp) (list resp)))
+        ((check-merged-boolean-pattern code)
+         => (lambda (suggested-code)
+              (list
+                (w/make-code-warning-with-suggestion
+                          debug-info "Contain mergeable clauses."
+                          code
+                          (list suggested-code)))))
+        (else '())))))
