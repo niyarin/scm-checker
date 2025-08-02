@@ -2,6 +2,7 @@
   (chicken
    (include "scm-checker/adapter/set.scm")
    (include "scheme-reader/scheme-reader/core.scm")
+   (include "scm-checker/config.scm")
    (include "scm-checker/reader.scm")
    (include "scm-checker/code-warning.scm")
    (include "scm-checker/check-component/import.scm")
@@ -16,6 +17,7 @@
 (import (scheme base)
         (scheme write)
         (scheme file)
+        (prefix (scm-checker config) config/)
         (prefix (scm-checker code-warning) w/)
         (only (srfi 1) append-map)
         (prefix (scm-checker reader) schk-rdr/)
