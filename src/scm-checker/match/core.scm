@@ -1,6 +1,8 @@
 (define-library (scm-checker match core)
   (import (scheme base)
           (only (srfi 1) fold)
+          (prefix (scm-checker reader)
+                  schk-rdr/)
           (prefix (scm-checker adapter box) box/))
   (export make-variable match make-bindings construct
           ref-bindings
@@ -36,7 +38,7 @@
                  #t)
           (equal? val (cdr exists-cell)))))
 
-    (define (%match language input bindings)
+    (define (%match language input debug-info bindings)
       (cond
         ((variable? language)
          (check-and-bind language input bindings))
@@ -46,21 +48,35 @@
         ((list? language)
          (and (list? input)
               (= (length language) (length input))
-              (fold (lambda (v1 v2 accm)
-                      (and accm (%match v1 v2 bindings)))
+              (fold (lambda (v1 v2 d accm)
+                      (and accm (%match v1 v2 d bindings)))
                     #t
                     language
-                    input)))
+                    input
+                    (if debug-info
+                      (schk-rdr/position-children debug-info)
+                      (map (lambda (x) #f) input)))))
         ((pair? language)
          (and (pair? input)
-              (%match (car language) (car input) bindings)
-              (%match (cdr language) (cdr input) bindings)))
+              (%match (car language) (car input)
+                      (and debug-info
+                           (car (schk-rdr/position-children debug-info)))
+                      bindings)
+              (%match (cdr language) (cdr input)
+                      (and debug-info
+                           (cdr (schk-rdr/position-children debug-info))
+                      bindings))))
         (else (eqv? language input))))
 
     (define (match language input . opt)
       ;;TODO: Use case lambda
       (let ((bindings (if (null? opt) (make-bindings) (car opt))))
-        (and (%match  language input bindings)
+        (and (%match language input #f bindings)
+             bindings)))
+
+    (define (match-with-debug-info language input debug-info . opt)
+      (let ((bindings (if (null? opt) (make-bindings) (car opt))))
+        (and (%match language input debug-info bindings)
              bindings)))
 
     (define (ref-bindings bindings var)

@@ -80,7 +80,12 @@
             (list (cons (car first)
                         (car tail))
                   (position-inc-col (cadr tail))
-                  position)
+                  (make-position*
+                    (position->filename position)
+                    (ref-line position)
+                    (+ (ref-col position) 1)
+                    (cons (list-ref first 2)
+                          (list-ref first 2))))
             tail)))
 
       (define (construct-code icode position)
