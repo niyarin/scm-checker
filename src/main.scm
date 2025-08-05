@@ -40,7 +40,7 @@
     (let ((constructed-list (schk-rdr/read-list1 (current-input-port) position)))
       (unless (null? (car constructed-list))
         (for-each
-          print-warn
+          (lambda (v) (print-warn v output-format))
           (checkers/check-code
             (caar constructed-list)
             (car (schk-rdr/position-children (list-ref constructed-list 2)))))
