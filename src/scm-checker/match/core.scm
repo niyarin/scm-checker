@@ -15,6 +15,14 @@
       variable?
       (name variable->name))
 
+    (define (bindings->matched bindings)
+      (let-values (((matched _) (box/unbox bindings)))
+        matched))
+
+    (define (bindings->debug-info bindings)
+      (let-values (((_ debug-info) (box/unbox bindings)))
+        debug-info))
+
     (define *cnt* 0)
     (define (make-variable)
       (set! *cnt* (+ *cnt* 1))
@@ -28,20 +36,27 @@
     (define var4 (make-variable))
 
     (define (make-bindings)
-      (box/box '()))
+      (box/box '() '()))
 
-    (define (check-and-bind var val bindings)
-      (let ((exists-cell (assq var (box/unbox bindings))))
-        (if (not exists-cell)
-          (begin (box/set-box! bindings
-                               (cons (cons var val) (box/unbox bindings)))
-                 #t)
-          (equal? val (cdr exists-cell)))))
+    (define (check-and-bind var val debug-info bindings)
+      (let ((exists-cell (assq var (bindings->matched bindings))))
+        (cond
+          ((not exists-cell)
+            (box/set-box! bindings
+                                 (cons (cons var val) (bindings->matched bindings))
+                                 (cons (cons var debug-info) (bindings->debug-info bindings)))
+             #t)
+          ((equal? val (cdr exists-cell))
+           (box/set-box! bindings
+                         (bindings->matched bindings)
+                         (cons (cons var debug-info) (bindings->debug-info bindings)))
+           #t)
+          (else #f))))
 
     (define (%match language input debug-info bindings)
       (cond
         ((variable? language)
-         (check-and-bind language input bindings))
+         (check-and-bind language input debug-info bindings))
         ((string? language)
          (and (string? input)
               (string=? input language)))
@@ -81,7 +96,7 @@
 
     (define (ref-bindings bindings var)
       (cond
-        ((assq var (box/unbox bindings))
+        ((assq var (bindings->matched bindings))
          => cdr)
         (else (error "Unused <variable>."))))
 

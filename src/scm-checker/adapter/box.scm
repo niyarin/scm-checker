@@ -8,7 +8,15 @@
       (export box unbox box? set-box!)
       (begin
         (define-record-type <box>
-          (box v)
+          (%box ls)
           box?
-          (v unbox set-box!))))))
+          (ls %unbox %set-box!))
 
+        (define (unbox box)
+          (apply values (%unbox box)))
+
+        (define (box . args)
+          (%box args))
+
+        (define (set-box! box . args)
+          (%set-box! box args))))))
