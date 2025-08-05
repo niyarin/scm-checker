@@ -25,7 +25,7 @@ git submodule update --init
 
 gosh -I ./src -I ./src/scheme-reader/ src/main.scm test-resources/source1.scm
 # sash -L ./src -L ./src/scheme-reader/ src/main.scm ./test-resources/source1.scm
-
+# guile --r7rs -L ./src -L ./src/scheme-reader/ src/main.scm  test-resources/source1.scm
 
 # OUTPUT
 # test-resources/source1.scm:3:9:W:Duplicate import.
