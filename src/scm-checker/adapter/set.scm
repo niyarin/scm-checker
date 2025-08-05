@@ -1,7 +1,7 @@
 (define-library (scm-checker adapter set)
   ;; Adapter for Scheme implementations that do not support SRFI 113 (scheme set).
   (cond-expand
-    ((or srfi-113 chicken)
+    ((or srfi-113 chicken sagittarius)
       (import (scheme base)
               (prefix (srfi 113) set/)
               (prefix (srfi 128) comparator/))

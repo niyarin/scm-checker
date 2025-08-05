@@ -87,7 +87,7 @@
   (display "--short-output: Output simple comment.")(newline)
   (display "--long-output: Output comment and suggestion.")(newline))
 
-(define (main)
+(define (%main)
   (let ((args (command-line)))
     (if (null? (cdr args))
       (print-help)
@@ -96,4 +96,4 @@
           (check-stdin output-format)
           (for-each (lambda (warn) (print-warn warn output-format))
                     (check-file filename)))))))
-(main)
+(%main)
