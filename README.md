@@ -1,5 +1,5 @@
 # Scm-checker
-(WIP) Code checker for Scheme.
+Code checker for Scheme.
 
 ## usage
 ```bash
