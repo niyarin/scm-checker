@@ -60,12 +60,12 @@
           (list '() position '())
           ls))
 
-      (define (%handle-list ls position)
+      (define (%handle-list ls position use-inc?)
         (let-list (((reversed-ls pos debug-info)
                     (%handle-list* ls
-                                   (position-inc-col position))))
+                                   (if use-inc? (position-inc-col position) position))))
            (list (reverse reversed-ls)
-                 (position-inc-col pos)
+                 (if use-inc? (position-inc-col pos) pos)
                  (make-position*
                    (position->filename position)
                    (ref-line position)
@@ -88,6 +88,26 @@
                           (list-ref first 2))))
             tail)))
 
+      (define (%string-move position s)
+        (let loop ((i 0)
+                   (line (ref-line position))
+                   (col (ref-col position)))
+          (cond
+            ((= i (string-length s))
+             (make-position* (position->filename position)
+                             line
+                             col
+                             #f))
+            ((char=? (string-ref s i) #\newline)
+             (loop (+ i 1) (+ line 1) 0))
+            ((and (char=? (string-ref s i) #\return)
+                  (char=? (string-ref s (+ i 1)) #\newline))
+             (loop (+ i 2) (+ line 1) 0))
+            ((char=? (string-ref s i) #\return)
+             (loop (+ i 1) (+ line 1) 0))
+            (else
+              (loop (+ i 1) line (+ col 1))))))
+
       (define (construct-code icode position)
         ;; return (constructed object, new-position, current position)
         ;;        IF icode is code element ELSE new-position
@@ -100,7 +120,7 @@
                            0))
 
           ((and (srdr/lexical? icode) (eq? (srdr/lexical-type icode) 'DOT-PAIR))
-           (let ((l (%handle-list (srdr/lexical-data icode) (position-append-col position 3))))
+           (let ((l (%handle-list (srdr/lexical-data icode) (position-append-col position 3) #t)))
              (list (caar l)
                    (cadr l)
                    (list-ref l 2))))
@@ -111,6 +131,10 @@
           ((and (srdr/lexical? icode) (eq? (srdr/lexical-type icode) 'ATOM))
            (list (srdr/lexical-data icode)
                  (position-append-col position (string-length (srdr/lexical-origin icode)))
+                 position))
+          ((and (srdr/lexical? icode) (eq? (srdr/lexical-type icode) 'STRING))
+           (list (srdr/lexical-data icode)
+                 (%string-move position (srdr/lexical-origin icode))
                  position))
 
           ;((and (srdr/lexical? icode))
@@ -127,7 +151,7 @@
                  (position-append-col position 3)
                  position))
           ((list? icode)
-           (%handle-list icode position))
+           (%handle-list icode position #t))
           ((pair? icode) (%handle-pair icode position))
 
           ((number? icode)
@@ -148,7 +172,7 @@
 
       (define (read-list1 port position)
         (let ((code (srdr/read-internal port)))
-          (%handle-list code position)))
+          (%handle-list code position #f)))
 
       (define (read-super filename)
         (call-with-input-file
