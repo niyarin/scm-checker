@@ -74,6 +74,7 @@
              (output-format 'SHORT))
     (cond
       ((null? args*) (values filename output-format))
+      ((string=? (car args*) "--help") (values filename 'HELP))
       ((string=? (car args*) "--short-output")
        (loop (cdr args*) filename 'SHORT))
       ((string=? (car args*) "--long-output")
@@ -92,8 +93,9 @@
     (if (null? (cdr args))
       (print-help)
       (let-values (((filename output-format) (simple-optparse args)))
-        (if (string=? filename "-")
-          (check-stdin output-format)
-          (for-each (lambda (warn) (print-warn warn output-format))
-                    (check-file filename)))))))
+        (cond
+          ((eq? output-format 'HELP) (print-help))
+          ((string=? filename "-") (check-stdin output-format))
+          (else (for-each (lambda (warn) (print-warn warn output-format))
+                          (check-file filename))))))))
 (%main)
