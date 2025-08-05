@@ -6,7 +6,8 @@
           (prefix (scm-checker adapter box) box/))
   (export make-variable match make-bindings construct
           ref-bindings
-          var1 var2 var3 var4)
+          var1 var2 var3 var4
+          make-pvariable)
   (begin
     ;;TODO: Support ellipsis pattern.
 
@@ -14,6 +15,12 @@
       (%make-variable name)
       variable?
       (name variable->name))
+
+    (define-record-type <with-pred-variable>
+      (%make-pvariable name pred)
+      pvariable?
+      (name pvariable->name)
+      (pred pvariable->pred))
 
     (define (bindings->matched bindings)
       (let-values (((matched _) (box/unbox bindings)))
@@ -26,9 +33,15 @@
     (define *cnt* 0)
     (define (make-variable)
       (set! *cnt* (+ *cnt* 1))
-
       (%make-variable (string->symbol
                         (string-append "v" (number->string *cnt*)))))
+
+    (define (make-pvariable pred)
+      (set! *cnt* (+ *cnt* 1))
+      (%make-pvariable (string->symbol
+                        (string-append "v" (number->string *cnt*)))
+                       pred))
+
 
     (define var1 (make-variable))
     (define var2 (make-variable))
@@ -57,6 +70,9 @@
       (cond
         ((variable? language)
          (check-and-bind language input debug-info bindings))
+        ((pvariable? language)
+         (and ((pvariable->pred language) input)
+              (check-and-bind language input debug-info bindings)))
         ((string? language)
          (and (string? input)
               (string=? input language)))

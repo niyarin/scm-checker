@@ -1,6 +1,9 @@
 (define-library (scm-checker check-component let)
   (import (scheme base)
-          (only (srfi 1) every)
+          (scheme write)
+          (only (srfi 1) every filter-map)
+          (prefix (scm-checker adapter set) set/)
+          (prefix (scm-checker utils) utils/)
           (prefix (scm-checker code-warning) w/)
           (prefix (scm-checker reader) schk-rdr/))
   (export check-let)
@@ -45,6 +48,31 @@
            ,(append let1-binding let2-binding)
            ,@let2-bodies)))
 
+    (define (find-unused-bindings expression debug-info)
+      (let* ((bindings (if (named-let? expression)
+                         (list-ref expression 2)
+                         (cadr expression)))
+             (vdinfos
+               (if (named-let? expression)
+                  (schk-rdr/position-children
+                    (list-ref (schk-rdr/position-children debug-info) 2))
+                  (schk-rdr/position-children
+                    (cadr (schk-rdr/position-children debug-info)))))
+             (vars (map car bindings))
+             (bodies (if (named-let? expression)
+                       (cdr (cddr expression))
+                       (cddr expression)))
+             (used-identifiers
+               (utils/get-identifiers bodies))
+             (unused-vars
+                (filter-map
+                  (lambda (v d)
+                    (and (not (set/contains? used-identifiers v))
+                         (cons v d)))
+                  vars
+                  vdinfos)))
+        unused-vars))
+
     (define (check-let expression debug-info)
       (cond
         ((not (valid-let? expression))
@@ -54,4 +82,12 @@
                   debug-info "Nested let."
                   expression
                   (list (combine-nested-let1 expression)))))
+        ((find-unused-bindings expression debug-info)
+         => (lambda (bs)
+              (map
+                (lambda (b)
+                  (w/make-code-warning
+                    (cdr b)
+                    "Unused variable."))
+                bs)))
         (else '())))))
