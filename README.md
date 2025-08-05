@@ -2,6 +2,23 @@
 Code checker for Scheme.
 
 ## usage
+
+```bash
+# Download the binary that matches your architecture and operating system.
+wget https://github.com/niyarin/scm-checker/releases/download/0.1.0/scm-checker-0.1.0-linux-x86_64 -O scm-checker
+chmod +x scm-checker
+scm-checker --long-output ./test-resources/source1.scm
+
+# OUTPUT
+# ./test-resources/source1.scm:3:9:W:Duplicate import.
+# ((scheme base) (scheme write)) =>
+# ./test-resources/source1.scm:7:6:W:Nested and.
+# (and (cons 3 4) (cons 100 200)) =>
+# (cons 3 4)(cons 100 200)
+# ....
+```
+
+## Run from Scheme interpreter
 ```bash
 # Run once.
 git submodule update --init
