@@ -7,6 +7,8 @@ Code checker for Scheme.
 # Download the binary that matches your architecture and operating system.
 wget https://github.com/niyarin/scm-checker/releases/download/0.1.0/scm-checker-0.1.0-linux-x86_64 -O scm-checker
 chmod +x scm-checker
+
+# --long-output is optional.
 scm-checker --long-output ./test-resources/source1.scm
 
 # OUTPUT
