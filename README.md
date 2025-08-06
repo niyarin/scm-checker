@@ -20,6 +20,17 @@ scm-checker --long-output ./test-resources/source1.scm
 # ....
 ```
 
+## Run from Docker
+```bash
+docker run --rm -i niyarin/scm-checker:latest < ./test-resources/source1.scm
+
+## OUTPUT
+#-:7:6:W:Nested and.
+#(and (cons 3 4) (cons 100 200)) =>
+#(cons 3 4)(cons 100 200)
+# ...
+```
+
 ## Run from Scheme interpreter
 ```bash
 # Run once.

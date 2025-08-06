@@ -9,10 +9,11 @@ RUN wget https://github.com/shirok/Gauche/releases/download/release0_9_15/Gauche
 RUN tar xzvf Gauche-0.9.15.tgz
 WORKDIR Gauche-0.9.15
 
-RUN mkdir /gauche-bin/
-RUN ./configure --prefix /gauche-bin/
+RUN mkdir /gauche-usr/
+RUN ./configure --prefix=/usr
 RUN make
 RUN make install
+RUN make DESTDIR=/gauche-dir/ install
 
 
 FROM alpine:3.21 AS getter
@@ -28,10 +29,8 @@ RUN git submodule update --init
 
 FROM alpine:3.21 AS runtime
 
-COPY --from=gauche-builder /gauche-bin /gauche-bin
-
+COPY --from=gauche-builder /gauche-dir/usr /usr/
 COPY --from=getter /scm-checker /scm-checker
-
 WORKDIR /scm-checker
 
-CMD ["/gauche-bin/bin/gosh", "-I", "./src", "-I", "./src/scheme-reader/", "src/main.scm", "-"]
+CMD ["gosh", "-I", "./src", "-I", "./src/scheme-reader/", "src/main.scm", "--long-output", "-"]
