@@ -30,11 +30,21 @@
            (list? (list-ref expression 3))
            (eq? (car (list-ref expression 3)) 'if)))
 
+    (define (unnecessary-if-case? expression)
+      (and (eq? (list-ref expression 2) #t)
+           (eq? (list-ref expression 3) #f)))
+
     (define (check-if expression debug-info)
       (cond
         ((not (valid-if? expression))
          ;;TODO: This should be error.(not warning)
           (list (w/make-code-warning debug-info "Invalid if.")))
+        ((unnecessary-if-case? expression)
+         (list (w/make-code-warning-with-suggestion
+                 debug-info
+                 "Unnecessary if."
+                 expression
+                 (cadr expression))))
         ((use-and-case? expression)
           (list (w/make-code-warning-with-suggestion
                   debug-info
