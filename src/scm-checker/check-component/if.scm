@@ -1,7 +1,5 @@
 (define-library (scm-checker check-component if)
   (import (scheme base)
-          (scheme write)
-          (only (srfi 1) every any remove)
           (prefix (scm-checker code-warning) w/))
   (export check-if)
   (begin
@@ -11,7 +9,7 @@
           (char? (cadr expression))))
 
     (define (always-false-if-case? expression)
-      (and (eq? (cadr expression) #f)))
+      (eq? (cadr expression) #f))
 
     (define (use-and-case? expression)
       (and (= (length expression) 4)
