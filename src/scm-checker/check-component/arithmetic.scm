@@ -3,7 +3,7 @@
           (prefix (scm-checker code-warning) w/)
           (prefix (scm-checker match core) m/)
           (prefix (scm-checker reader) schk-rdr/))
-  (export check-= check-> check-<)
+  (export check-= check-> check-< check-zero?)
   (begin
     (define (check-use-zero-case expression)
       (cond
@@ -38,6 +38,25 @@
                                         bindings)))))
        (else #f)))
 
+   (define (check-use-even? expression debug-info)
+     (cond
+       ((or (m/match `(zero? (modulo ,m/var1 2)) expression)
+            (m/match `(= (modulo ,m/var1 2) 0) expression))
+        =>
+        (lambda (bindings)
+          (w/make-code-warning-with-suggestion
+                     debug-info "Use even?."
+                     expression
+                     (list (m/construct `(even? ,m/var1)
+                                        bindings)))))
+       (else #f)))
+
+    (define (check-zero? expression debug-info)
+      (cond
+        ((check-use-even? expression debug-info)
+         => list)
+        (else #f)))
+
     (define (check-= expression debug-info)
       (cond
         ((check-use-zero-case expression)
@@ -45,7 +64,8 @@
               (list (w/make-code-warning-with-suggestion
                       debug-info "Use zero?."
                       expression `((zero? ,v))))))
-        ((check-use-odd? expression debug-info)
+        ((or (check-use-odd? expression debug-info)
+             (check-use-even? expression debug-info))
          => (lambda (v) (list v)))
         (else '())))
 

@@ -90,6 +90,8 @@
         ((eq? (car code) '=)
          (append (chk-arithmetic/check-= code debug-info)
                  (handle-list code debug-info)))
+        ((eq? (car code) 'zero?)
+         (chk-arithmetic/check-zero? code debug-info))
         ((eq? (car code) '>)
          (append (chk-arithmetic/check-> code debug-info)
                  (handle-list code debug-info)))
