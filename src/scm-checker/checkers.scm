@@ -18,7 +18,7 @@
     (define (handle-list code debug-info)
       (let ((debug-info-list* (schk-rdr/position-children debug-info)))
         (append-map
-          (lambda (code* debug-info*) (check-code code* debug-info*))
+          check-code
           code
           debug-info-list*)))
 

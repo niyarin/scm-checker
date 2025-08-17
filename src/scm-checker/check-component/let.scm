@@ -1,6 +1,5 @@
 (define-library (scm-checker check-component let)
   (import (scheme base)
-          (scheme write)
           (only (srfi 1) every filter-map fold)
           (prefix (scm-checker adapter set) set/)
           (prefix (scm-checker utils) utils/)

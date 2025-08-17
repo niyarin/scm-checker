@@ -66,7 +66,7 @@
       (display " =>")
       (newline)
 
-      (for-each (lambda (x) (write x)) (w/code-warning->suggestion warn))
+      (for-each write (w/code-warning->suggestion warn))
       (newline))))
 
 (define (simple-optparse args)

@@ -119,8 +119,7 @@
 
     (define (check-cond code debug-info)
       (cond
-        ((check-cond->case-pattern code debug-info)
-         => (lambda (resp) (list resp)))
+        ((check-cond->case-pattern code debug-info) => list)
         ((check-merged-boolean-pattern code)
          => (lambda (suggested-code)
               (list
