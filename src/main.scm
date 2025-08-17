@@ -15,6 +15,7 @@
    (include "scm-checker/check-component/let.scm")
    (include "scm-checker/check-component/cons.scm")
    (include "scm-checker/check-component/arithmetic.scm")
+   (include "scm-checker/check-component/lambda.scm")
    (include "scm-checker/checkers.scm"))
   (else))
 

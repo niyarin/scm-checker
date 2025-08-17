@@ -11,7 +11,8 @@
           (prefix (scm-checker check-component let) chk-let/)
           (prefix (scm-checker check-component cons) chk-cons/)
           (prefix (scm-checker check-component arithmetic) chk-arithmetic/)
-          (prefix (scm-checker check-component and) chk-and/))
+          (prefix (scm-checker check-component and) chk-and/)
+          (prefix (scm-checker check-component lambda) chk-lambda/))
   (export check-code)
   (begin
     (define (handle-list code debug-info)
@@ -78,6 +79,7 @@
                  (handle-list code debug-info)))
         ((eq? (car code) 'lambda)
          (append (chk-cons/check-cons-in-the-lambda code debug-info)
+                 (chk-lambda/check-lambda code debug-info)
                  (handle-list code debug-info)))
         ((eq? (car code) 'let)
          (append (chk-let/check-let code debug-info)

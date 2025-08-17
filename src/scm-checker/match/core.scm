@@ -95,8 +95,8 @@
                       bindings)
               (%match (cdr language) (cdr input)
                       (and debug-info
-                           (cdr (schk-rdr/position-children debug-info))
-                      bindings))))
+                           (cdr (schk-rdr/position-children debug-info)))
+                      bindings)))
         (else (eqv? language input))))
 
     (define (match language input . opt)
