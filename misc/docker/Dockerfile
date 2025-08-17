@@ -23,7 +23,7 @@ RUN apk add git
 
 
 WORKDIR /
-RUN git clone https://github.com/niyarin/scm-checker
+RUN git clone https://github.com/niyarin/scm-checker -b 0.1.3
 WORKDIR /scm-checker
 RUN git submodule update --init
 
