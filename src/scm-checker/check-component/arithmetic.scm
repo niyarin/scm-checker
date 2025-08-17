@@ -1,6 +1,7 @@
 (define-library (scm-checker check-component arithmetic)
   (import (scheme base)
           (prefix (scm-checker code-warning) w/)
+          (prefix (scm-checker match core) m/)
           (prefix (scm-checker reader) schk-rdr/))
   (export check-= check-> check-<)
   (begin
@@ -25,6 +26,18 @@
          (cadr expression))
         (else #f)))
 
+   (define (check-use-odd? expression debug-info)
+     (cond
+       ((m/match `(= (modulo ,m/var1 2) 1) expression)
+        =>
+        (lambda (bindings)
+          (w/make-code-warning-with-suggestion
+                     debug-info "Use odd?."
+                     expression
+                     (list (m/construct `(odd? ,m/var1)
+                                        bindings)))))
+       (else #f)))
+
     (define (check-= expression debug-info)
       (cond
         ((check-use-zero-case expression)
@@ -32,6 +45,8 @@
               (list (w/make-code-warning-with-suggestion
                       debug-info "Use zero?."
                       expression `((zero? ,v))))))
+        ((check-use-odd? expression debug-info)
+         => (lambda (v) (list v)))
         (else '())))
 
     (define (check-> expression debug-info)
