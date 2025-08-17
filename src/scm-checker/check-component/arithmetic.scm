@@ -55,7 +55,7 @@
       (cond
         ((check-use-even? expression debug-info)
          => list)
-        (else #f)))
+        (else '())))
 
     (define (check-= expression debug-info)
       (cond
