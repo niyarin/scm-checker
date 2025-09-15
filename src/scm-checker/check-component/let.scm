@@ -56,7 +56,7 @@
           ((null? vars) resp)
           ((set/contains? body-identifiers (car vars))
            (loop resp (cdr vars) (cdr val-identifiers) (cdr vdinfos)))
-          ((set/contains? (fold (lambda (x accm) (set/union x accm))
+          ((set/contains? (fold set/union
                                 (set/make-set-eq)
                                 (cdr val-identifiers))
                           (car vars))

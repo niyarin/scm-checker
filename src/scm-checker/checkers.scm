@@ -64,9 +64,7 @@
                                (or (any (lambda (import-set) (chk-import/used-library-namd? import-set '(srfi 1)))
                                         (cdr (caar imports)))
                                    (config/get-config 'srfi-1)))))
-            (append-map (lambda (x debug-info*) (check-code x debug-info*))
-                        (map car begins)
-                        (map cdr begins))))))
+            (append-map check-code (map car begins) (map cdr begins))))))
 
     (define (check-code code debug-info)
       (cond
