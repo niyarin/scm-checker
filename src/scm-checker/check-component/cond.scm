@@ -1,6 +1,6 @@
 (define-library (scm-checker check-component cond)
   (import (scheme base)
-          (only (srfi 1) every any remove find)
+          (only (srfi 1) every any remove find last)
           (prefix (scm-checker code-warning) w/)
           (prefix (scm-checker reader) schk-rdr/))
   (export check-cond)
@@ -45,11 +45,15 @@
                                   (list-ref test 2))
                                 (cadr clause))))))))
 
+    (define (apply-clause? clause)
+      (and (= (length clause) 3)
+           (eq? (cadr clause) '=>)))
+
     (define (simple-clause? clause)
       (and (list? clause)
            (or (else-clause? clause)
                (and (>= (length clause) 2)
-                    (not (eq? (cadr clause) '=>))))))
+                    (not (apply-clause? clause))))))
 
     (define (all-same? ls)
       (or (null? ls)
@@ -117,9 +121,18 @@
            (reverse (cons `(else (not ,(car clause1))) reverse-head)))
           (else #f))))
 
+    (define (cond-may-returns-unspecified-value? code debug-info)
+      (and (not (any else-clause? (cdr code)))
+           (not (apply-clause? (last code)))))
+
     (define (check-cond code debug-info)
       (cond
         ((check-cond->case-pattern code debug-info) => list)
+        ((cond-may-returns-unspecified-value? code debug-info)
+         (list
+          (w/make-code-warning
+            debug-info
+            "Cond may returns an unspecified value.")))
         ((check-merged-boolean-pattern code)
          => (lambda (suggested-code)
               (list
