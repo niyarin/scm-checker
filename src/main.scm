@@ -8,6 +8,7 @@
    (include "scm-checker/reader.scm")
    (include "scm-checker/match/core.scm")
    (include "scm-checker/code-warning.scm")
+   (include "scm-checker/check-component/quasiquote.scm")
    (include "scm-checker/check-component/import.scm")
    (include "scm-checker/check-component/if.scm")
    (include "scm-checker/check-component/cond.scm")

@@ -6,6 +6,7 @@
           (prefix (scm-checker utils) utils/)
           (prefix (scm-checker code-warning) w/)
           (prefix (scm-checker check-component import) chk-import/)
+          (prefix (scm-checker check-component quasiquote) chk-quasiquote/)
           (prefix (scm-checker check-component if) chk-if/)
           (prefix (scm-checker check-component cond) chk-cond/)
           (prefix (scm-checker check-component let) chk-let/)
@@ -104,9 +105,8 @@
           (append (chk-and/check-and code debug-info)
                   (handle-list code debug-info)))
         ((quote) '())
-        ((quasiquote) '())
+        ((quasiquote) (chk-quasiquote/check-quasiquote code debug-info))
         (else (handle-list code debug-info))))
-
 
     (define (check-code code debug-info)
       (if (or (not (list? code))
