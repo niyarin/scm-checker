@@ -1,14 +1,16 @@
 (define-library (scm-checker checkers-test)
   (import (scheme base)
-          (scheme write)
           (prefix (scm-checker checkers) checkers/)
+          (prefix (scm-checker reader) reader/)
+          (prefix (scm-checker code-warning) warn/)
           (srfi 78))
   (export test-checkers)
   (begin
     (define (test-handle-list)
-      (check (checkers/check-code "test" '()) => '()))
+      (check (checkers/check-code "test" '()) => '())
+      (check (checkers/check-code '(+ 1 2) reader/<no-position>) => '())
+      (check (warn/code-warning? (car (checkers/check-code '(= a 0) reader/<no-position>))) => #t))
 
     (define (test-checkers)
       (test-handle-list)
-
       )))

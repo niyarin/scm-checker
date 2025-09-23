@@ -7,7 +7,8 @@
           (only (srfi 1) fold)
           (prefix (scheme-reader core) srdr/))
   (export read-super position->pair position-children position->filename read-list1
-          initial-position)
+          initial-position
+          <no-position>)
   (begin
     (define-record-type <position>
       (make-position* filename line col children)
@@ -38,6 +39,11 @@
 
     (define (position-inc-col pos)
       (position-append-col pos 1))
+
+    (define no-position-children (cons #f #f))
+    (define <no-position> (make-position* "NONE" 0 0 no-position-children))
+    (set-car! no-position-children <no-position>)
+    (set-cdr! no-position-children no-position-children)
 
     (define (initial-position filename) (make-position* filename 1 1 '()))
 

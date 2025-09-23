@@ -2,7 +2,8 @@
   (import (scheme base))
   (export make-code-warning code-warning->pos code-warning->message code-warning->suggestion
           code-warning->code
-          make-code-warning-with-suggestion )
+          make-code-warning-with-suggestion
+          code-warning?)
   (begin
     (define-record-type <code-warning>
       (make-code-warning* pos message code suggestion)
