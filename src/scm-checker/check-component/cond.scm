@@ -125,8 +125,15 @@
       (and (not (any else-clause? (cdr code)))
            (not (apply-clause? (last code)))))
 
+    (define (check-invalid-cond code debug-info)
+      (cond
+        ((null? (cdr code))
+         (w/make-code-warning debug-info "Invalid cond."))
+        (else #f)))
+
     (define (check-cond code debug-info)
       (cond
+        ((check-invalid-cond code debug-info) => list)
         ((check-cond->case-pattern code debug-info) => list)
         ((cond-may-returns-unspecified-value? code debug-info)
          (list

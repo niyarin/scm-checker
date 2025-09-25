@@ -24,6 +24,17 @@
           code
           debug-info-list*)))
 
+    (define (handle-case code debug-info)
+      (let ((debug-info-list* (schk-rdr/position-children debug-info)))
+        (if (>= (length code) 2)
+          (append-map
+            (lambda (clause di)
+              (let ((di* (cdr (schk-rdr/position-children di))))
+                (append-map check-code (cdr clause) di*)))
+            (cddr code)
+            (cddr debug-info-list*))
+          '())))
+
     (define (import-library-declaration? expression)
       (eq? (car expression) 'import))
 
@@ -39,7 +50,7 @@
         ls
         debug-infos))
 
-    (define (handle-r7rs-library code debug-info)
+    (define (handle-r7rs-library* code debug-info)
       (let* ((debug-infos (cddr (schk-rdr/position-children debug-info)))
              (declarations (cddr code))
              (imports (filter-with-debug-info
@@ -68,6 +79,16 @@
                                    (config/get-config 'srfi-1)))))
             (append-map check-code (map car begins) (map cdr begins))))))
 
+    (define (invalid-r7rs-library? code)
+      (cond
+        ((null? (cdr code)) #t);;no library name
+        (else #f)))
+
+    (define (handle-r7rs-library code debug-info)
+       (if (invalid-r7rs-library? code)
+          (list (w/make-code-warning debug-info "Invalid r7rs library."))
+          (handle-r7rs-library* code debug-info)))
+
     (define (%check-list-code code debug-info)
       (case (car code)
         ((import) (chk-import/check-import code debug-info) )
@@ -85,6 +106,7 @@
          (append (chk-let/check-let* code debug-info)
                  (handle-list code debug-info)))
         ((define-library) (handle-r7rs-library code debug-info))
+        ((case) (handle-case code debug-info))
         ((=)
          (append (chk-arithmetic/check-= code debug-info)
                  (handle-list code debug-info)))
