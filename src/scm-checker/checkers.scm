@@ -13,6 +13,7 @@
           (prefix (scm-checker check-component cons) chk-cons/)
           (prefix (scm-checker check-component arithmetic) chk-arithmetic/)
           (prefix (scm-checker check-component and) chk-and/)
+          (prefix (scm-checker check-component pair) chk-pair/)
           (prefix (scm-checker check-component lambda) chk-lambda/))
   (export check-code)
   (begin
@@ -97,6 +98,9 @@
                  (handle-list code debug-info)))
         ((cons)
          (append (chk-cons/check-cons code debug-info)
+                 (handle-list code debug-info)))
+        ((list)
+         (append (chk-pair/check-list code debug-info)
                  (handle-list code debug-info)))
         ((if)
          (append (chk-if/check-if code debug-info)

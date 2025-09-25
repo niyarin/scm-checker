@@ -2,10 +2,12 @@
         (scheme process-context)
         (scheme write)
         (srfi 78)
-        (scm-checker checkers-test))
+        (scm-checker checkers-test)
+        (scm-checker check-component pair-test))
 
 (define test-defs
-  `(("scm-checker.checkers-test" .  ,test-checkers)))
+  `(("scm-checker.checkers-test" .  ,test-checkers)
+    ("scm-checker.check-component.checkers-test" .  ,test-check-component-pair)))
 
 (define (do-test tests)
   (for-each
