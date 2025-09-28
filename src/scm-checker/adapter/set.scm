@@ -31,8 +31,8 @@
           (apply set/set
                  eq-comparator
                  args))))
-    ((or srfi-1 guile)
-     ;; Guile Scheme has no srfi-1 in (feature) symbols.
+    ((or srfi-1 guile kawa)
+     ;; Guile Scheme and Kawa has no srfi-1 in (feature) symbols.
      (import (scheme base)
              (srfi 1))
 
