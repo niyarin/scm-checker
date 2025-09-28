@@ -6,13 +6,6 @@
           (prefix (scm-checker reader) schk-rdr/))
   (export check-import simple-library-check used-library-namd?)
   (begin
-    (define (import-set->library-name import-set)
-      (if (list? import-set)
-        (case (car import-set)
-          ((only except prefix rename) (import-set->library-name (cadr import-set)))
-          (else import-set))
-        import-set))
-
     (define (standard-library-name->identifiers library-name)
       (if (not (= (length library-name) 2))
         (error "Error.")
@@ -93,10 +86,11 @@
 
     (define (import-set->library-name import-set)
       (let loop ((import-set* import-set))
-        (case (car import-set*)
-          ((only except prefix rename)
-           (loop (cadr import-set*)))
-          (else import-set*))))
+        (if (list? import-set*)
+          (case (car import-set*)
+            ((only except prefix rename) (import-set->library-name (cadr import-set*)))
+            (else import-set*))
+          import-set*)))
 
     (define (used-library-namd? import-set library-name)
       (equal? (import-set->library-name import-set) library-name))))

@@ -8,6 +8,7 @@
           (prefix (scheme-reader core) srdr/))
   (export read-super position->pair position-children position->filename read-list1
           initial-position
+          position?
           <no-position>)
   (begin
     (define-record-type <position>
