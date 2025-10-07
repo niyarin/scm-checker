@@ -1,6 +1,6 @@
 (define-library (scm-checker check-component cond)
   (import (scheme base)
-          (only (srfi 1) every any remove find last)
+          (only (srfi 1) every any remove find last filter-map)
           (prefix (scm-checker code-warning) w/)
           (prefix (scm-checker reader) schk-rdr/))
   (export check-cond)
@@ -128,12 +128,21 @@
     (define (check-invalid-cond code debug-info)
       (cond
         ((null? (cdr code))
-         (w/make-code-warning debug-info "Invalid cond."))
-        (else #f)))
+         (list (w/make-code-warning debug-info "Invalid cond.")))
+        ((filter-map
+           (lambda (c di)
+            (if (list? c)
+              #f
+              (w/make-code-warning di "Cond clause must be list.")))
+          (cdr code)
+          (cdr (schk-rdr/position-children debug-info)))
+        => (lambda (invalid-clauses)
+             (and (not (null? invalid-clauses))
+                  invalid-clauses)))))
 
     (define (check-cond code debug-info)
       (cond
-        ((check-invalid-cond code debug-info) => list)
+        ((check-invalid-cond code debug-info) => values)
         ((check-cond->case-pattern code debug-info) => list)
         ((cond-may-returns-unspecified-value? code debug-info)
          (list
