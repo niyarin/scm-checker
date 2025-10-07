@@ -1,6 +1,6 @@
 (define-library (scm-checker check-component let)
   (import (scheme base)
-          (only (srfi 1) every filter-map fold)
+          (only (srfi 1) every filter-map fold find)
           (prefix (scm-checker adapter set) set/)
           (prefix (scm-checker utils) utils/)
           (prefix (scm-checker code-warning) w/)
@@ -123,6 +123,34 @@
                 bs)))
         (else '())))
 
+    (define (find-duplicates vars debug-info-ls)
+      (let loop ((vars vars)
+                 (dbgs debug-info-ls)
+                 (res '()))
+        (cond
+          ((null? vars) res)
+          ((find (lambda (x) (eq? x (car vars)))
+                 (cdr vars))
+           (loop (cdr vars) (cdr dbgs) (cons (cons (car vars) (car dbgs)) res)))
+          (else (loop (cdr vars) (cdr dbgs) res)))))
+
+    ;;error
+    (define (check-duplicated-vars expression debug-info)
+      (let* ((is-named-let (named-let? expression))
+             (bindings (if is-named-let
+                         (list-ref expression 2)
+                         (cadr expression)))
+             (bindings-dbg (if is-named-let
+                             (list-ref (schk-rdr/position-children debug-info) 2)
+                             (cadr (schk-rdr/position-children debug-info))))
+             (vars (map car bindings))
+             (dbg-vars (schk-rdr/position-children bindings-dbg))
+             (dups (find-duplicates (reverse vars) (reverse dbg-vars))))
+        (map (lambda (var-debug)
+               (w/make-code-warning
+                 (cdr var-debug)
+                 "Duplicate vars."))
+             dups)))
 
     (define (check-let expression debug-info)
       (cond
@@ -133,6 +161,8 @@
                   debug-info "Nested let."
                   expression
                   (list (combine-nested-let1 expression)))))
+        ((check-duplicated-vars  expression debug-info)
+         => values)
         ((find-unused-bindings expression debug-info)
          => (lambda (bs)
               (map
