@@ -181,15 +181,31 @@
         (let ((code (srdr/read-internal port)))
           (%handle-list code position #f)))
 
+      (define (handle-shebang port position)
+        (let ((code (srdr/read-internal-or-handle-shebang port)))
+          (if (and (srdr/lexical? code)
+                   (eq? (srdr/lexical-type code) 'SHEBANG))
+            (begin
+              (read-char port)
+              (list '() (position-newline position) '()))
+            (let-list (((constructed position debug-info)
+                        (%handle-list code position #f)))
+              (list (list constructed) position (list debug-info))))))
+
       (define (read-super filename)
         (call-with-input-file
           filename
           (lambda (port)
-            (let ((position (initial-position filename)))
-              (let loop ((constructed-list '())
-                         (position position)
-                         (debug-info-list '()))
-                (let-list (( (constructed new-position debug-info) (read-list1 port position)))
+            (let-list (( (iconstructed-list
+                          iposition
+                          idebug-info-list)
+                        (handle-shebang port (initial-position filename))))
+
+              (let loop ((constructed-list iconstructed-list)
+                         (position iposition)
+                         (debug-info-list idebug-info-list))
+                (let-list (( (constructed new-position debug-info)
+                                (read-list1 port position)))
                   (if (null? constructed)
                     (values (reverse constructed-list)
                             (reverse debug-info-list))
