@@ -121,6 +121,11 @@
         ((cons)
          (append (chk-cons/check-cons code debug-info)
                  (handle-list code debug-info)))
+        ((cdr car caar cadr cdar cddr
+          caaar caadr cadar caddr
+          cdaar cdadr cddar cdddr)
+         (append (chk-pair/check-cxr code debug-info)
+                 (handle-list code debug-info)))
         ((list)
          (append (chk-pair/check-list code debug-info)
                  (handle-list code debug-info)))
