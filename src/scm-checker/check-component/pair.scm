@@ -26,6 +26,18 @@
                   "Use drop 3."
                   expression
                   (list (m/construct `(drop ,m/var1 3) bindings))))))
+
+        ;;drop 4
+        ((or (m/match `(cddddr ,m/var1) expression)
+             (m/match `(cddr (cddr ,m/var1)) expression))
+         => (lambda (bindings)
+              (list
+                (w/make-code-warning-with-suggestion
+                  debug-info
+                  "Use drop 4."
+                  expression
+                  (list (m/construct `(drop ,m/var1 4) bindings))))))
+
         (else  '())))
 
     (define (check-cxr expression debug-info)
