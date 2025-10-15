@@ -1,6 +1,7 @@
 (define-library (scm-checker check-component let)
   (import (scheme base)
-          (only (srfi 1) every filter-map fold find)
+          (scheme write)
+          (only (srfi 1) every filter-map fold find drop append-map)
           (prefix (scm-checker adapter set) set/)
           (prefix (scm-checker utils) utils/)
           (prefix (scm-checker code-warning) w/)
@@ -134,6 +135,29 @@
            (loop (cdr vars) (cdr dbgs) (cons (cons (car vars) (car dbgs)) res)))
           (else (loop (cdr vars) (cdr dbgs) res)))))
 
+    (define (%check-argnum-loop code debug-info proc-name argnum)
+      (if (and (not (null? code)) (list? code))
+        (let ((res (append-map
+                     (lambda (x d) (%check-argnum-loop x d proc-name argnum))
+                     code
+                     (schk-rdr/position-children debug-info))))
+          (if (and (eq? (car code) proc-name)
+                   (not (= (length (cdr code)) argnum)))
+            (cons (w/make-code-warning debug-info "ERROR: Argnum is not match.")
+                  res)
+            res))
+        '()))
+
+    (define (check-named-let-argnum expression debug-info)
+      (let ((name (cadr expression))
+            (debug-infos (schk-rdr/position-children debug-info))
+            (argnum (length (list-ref expression 2)))
+            (bodies (drop expression 3)))
+        (append-map
+          (lambda (body d) (%check-argnum-loop body d name argnum))
+          bodies
+          (drop debug-infos 3))))
+
     ;;error
     (define (check-duplicated-vars expression debug-info)
       (let* ((is-named-let (named-let? expression))
@@ -161,6 +185,10 @@
                   debug-info "Nested let."
                   expression
                   (list (combine-nested-let1 expression)))))
+
+        ((and (named-let? expression)
+              (check-named-let-argnum expression debug-info))
+          => values)
         ((check-duplicated-vars  expression debug-info)
          => values)
         ((find-unused-bindings expression debug-info)
