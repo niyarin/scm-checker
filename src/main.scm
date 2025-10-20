@@ -82,6 +82,12 @@
        (loop (cdr args*) filename 'SHORT))
       ((string=? (car args*) "--long-output")
        (loop (cdr args*) filename 'LONG))
+
+      ;;features
+      ((string=? (car args*) "--use-srfi-1")
+       (config/set-initial-config! 'srfi-1 #t)
+       (loop (cdr args*) filename output-format))
+
       (else (loop (cdr args*) (car args*) output-format)))))
 
 (define (print-help)
