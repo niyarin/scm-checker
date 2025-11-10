@@ -5,6 +5,7 @@
           (prefix (scm-checker adapter set) set/)
           (prefix (scm-checker utils) utils/)
           (prefix (scm-checker code-warning) w/)
+          (prefix (scm-checker match core) m/)
           (prefix (scm-checker reader) schk-rdr/))
   (export check-let check-let* )
   (begin
@@ -113,10 +114,28 @@
                   vdinfos)))
         unused-vars))
 
+    (define (nested-let* expression debug-info)
+      (let ((binding1 (m/make-pvariable list?))
+            (binding2 (m/make-pvariable list?)))
+        (cond
+          ((m/match `(let* ,binding1 (let* ,binding2 ,m/var1)) expression)
+           => (lambda (bindings)
+                  (w/make-code-warning-with-suggestion
+                    debug-info
+                    "Nested let*."
+                    expression
+                    (list `(let* ,(append (m/ref-bindings bindings binding1)
+                                          (m/ref-bindings bindings binding2))
+                             ,(m/ref-bindings bindings m/var1))))))
+          (else #f))))
+
     (define (check-let* expression debug-info)
       (cond
         ((not (valid-let? expression))
          (list (w/make-code-warning debug-info "Invalid let*.")))
+        ((nested-let* expression debug-info)
+         => (lambda (bs)
+              (list bs)))
         ((find-unused-bindings-for-let* expression debug-info)
          => (lambda (bs)
               (map
