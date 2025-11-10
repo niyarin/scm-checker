@@ -139,6 +139,12 @@
            (list (srdr/lexical-data icode)
                  (position-append-col position (string-length (srdr/lexical-origin icode)))
                  position))
+          ((and (srdr/lexical? icode) (eq? (srdr/lexical-type icode) 'KEYWORD))
+           (list (srdr/lexical-data icode)
+                 (position-append-col
+                   position
+                   (+ 2 (string-length (symbol->string (srdr/lexical-origin icode)))))
+                 position))
           ((and (srdr/lexical? icode) (eq? (srdr/lexical-type icode) 'STRING))
            (list (srdr/lexical-data icode)
                  (%string-move position (srdr/lexical-origin icode))
