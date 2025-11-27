@@ -76,7 +76,7 @@
                  (make-position*
                    (position->filename position)
                    (ref-line position)
-                   (+ (ref-col position) 1)
+                   (ref-col position)
                    (reverse debug-info)))))
 
       (define (%handle-pair pair position)
@@ -124,7 +124,7 @@
           ((and (srdr/lexical? icode) (eq? (srdr/lexical-type icode) 'NEWLINE))
             (make-position (position->filename position)
                            (+ (ref-line position) 1)
-                           0))
+                           1))
 
           ((and (srdr/lexical? icode) (eq? (srdr/lexical-type icode) 'DOT-PAIR))
            (let ((l (%handle-list (srdr/lexical-data icode) (position-append-col position 3) #t)))
@@ -194,9 +194,9 @@
             (begin
               (read-char port)
               (list '() (position-newline position) '()))
-            (let-list (((constructed position debug-info)
+            (let-list (((constructed next-position debug-info)
                         (%handle-list code position #f)))
-              (list (list constructed) position (list debug-info))))))
+              (list (list constructed) next-position (list debug-info))))))
 
       (define (read-super filename)
         (call-with-input-file
