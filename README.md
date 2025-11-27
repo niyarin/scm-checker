@@ -1,11 +1,11 @@
 # Scm-checker
-Code checker / Linkter for Scheme.
+Linter for (R7RS, R5RS, partially R6RS) Scheme.
 
 ## usage
 
 ```bash
 # Download the binary that matches your architecture and operating system.
-wget https://github.com/niyarin/scm-checker/releases/download/0.1.0/scm-checker-0.1.0-linux-x86_64 -O scm-checker
+wget https://github.com/niyarin/scm-checker/releases/download/0.1.7/scm-checker-0.1.7-linux-x86_64 -O scm-checker
 chmod +x scm-checker
 
 # --long-output is optional.
@@ -32,6 +32,8 @@ docker run --rm -i niyarin/scm-checker:latest < ./test-resources/source1.scm
 ```
 
 ## Run from Scheme interpreter
+It has been confirmed to work on Guile 3.0, Gauche 0.9.15, Sagittarius 0.9.13, and Chicken 5.4.0.
+
 ```bash
 # Run once.
 git submodule update --init
@@ -62,3 +64,6 @@ Make sure the compiled binary of this software is placed somewhere in your $PATH
 
 ### Github Actions
 By using [niyarin/scm-checker-action](https://github.com/niyarin/scm-checker-action), you can use this application with GitHub Actions.
+
+## License
+[MIT](https://github.com/niyarin/scm-checker/blob/main/LICENSE)
