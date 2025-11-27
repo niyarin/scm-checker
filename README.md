@@ -1,5 +1,5 @@
 # Scm-checker
-Code checker for Scheme.
+Code checker / Linkter for Scheme.
 
 ## usage
 
