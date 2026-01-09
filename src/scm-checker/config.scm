@@ -1,10 +1,16 @@
 (define-library (scm-checker config)
-  (import (scheme base))
-  (export *dynamic-configs* get-config get-dynamic-config
+  (import (scheme base)
+          (prefix (scm-checker adapter set) set/))
+  (export *dynamic-configs*
+          get-config get-dynamic-config
           set-initial-config!)
   (begin
+    (define %default-use-linters
+      (set/make-set-eq '(valid-if always-true-if use-and use-when)))
+
     (define *dynamic-configs*
-      (list (cons 'srfi-1 (make-parameter #f))))
+      (list (cons 'srfi-1 (make-parameter #f))
+            (cons 'use-linters (make-parameter %default-use-linters))))
 
     (define (set-initial-config! feature value)
       (cond

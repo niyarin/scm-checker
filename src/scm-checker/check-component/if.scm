@@ -57,7 +57,7 @@
                   expression
                   `((when ,(cadr expression)
                           ,(list-ref expression 2))))))
-        ((always-true-if-case? expression)
+        ((always-true-if-case? expression);; unnecessary-if-case?
           (list (w/make-code-warning-with-suggestion
                   debug-info "Test is always true."
                   expression
