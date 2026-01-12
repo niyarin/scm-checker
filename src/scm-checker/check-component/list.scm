@@ -19,6 +19,19 @@
                                    bindings)))))
         (else #f)))
 
+    (define (%length-zero-check expression debug-info)
+      (cond
+        ((or (m/match `(= (length ,m/var1) 0) expression)
+             (m/match `(zero? (length ,m/var1)) expression))
+         => (lambda (bindings)
+              (w/make-code-warning-with-suggestion
+                debug-info
+                "Causes unnecessary traversals."
+                expression
+                (list (m/construct `(null? (cdr ,m/var1))
+                                   bindings)))))
+        (else #f)))
+
     (define (%length-more-than-one-check expression debug-info)
       (cond
         ((m/match `(> (length ,m/var1) 1) expression)
@@ -36,6 +49,8 @@
     (define (check-list-for-= expression debug-info)
       (cond
         ((%length-one-check expression debug-info)
+         => list)
+        ((%length-zero-check expression debug-info)
          => list)
         (else '())))
 
