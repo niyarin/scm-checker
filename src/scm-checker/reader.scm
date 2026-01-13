@@ -122,9 +122,7 @@
           ((and (srdr/lexical? icode) (eq? (srdr/lexical-type icode) 'SPACE))
            (position-append-col position 1))
           ((and (srdr/lexical? icode) (eq? (srdr/lexical-type icode) 'NEWLINE))
-            (make-position (position->filename position)
-                           (+ (ref-line position) 1)
-                           1))
+            (position-newline position))
 
           ((and (srdr/lexical? icode) (eq? (srdr/lexical-type icode) 'DOT-PAIR))
            (let ((l (%handle-list (srdr/lexical-data icode) (position-append-col position 3) #t)))
@@ -133,7 +131,11 @@
                    (list-ref l 2))))
 
           ((and (srdr/lexical? icode) (eq? (srdr/lexical-type icode) 'COMMENT))
-            (position-newline position))
+            (make-position (position->filename position)
+                           (ref-line position)
+                           (+ (ref-col position)
+                              (string-length (srdr/lexical-data icode))
+                              1)))
 
           ((and (srdr/lexical? icode) (eq? (srdr/lexical-type icode) 'ATOM))
            (list (srdr/lexical-data icode)
