@@ -14,6 +14,10 @@
           ((file) '(call-with-input-file call-with-output-file delete-file
                     file-exists?  open-binary-input-file open-binary-output-file
                     open-input-file open-output-file with-input-from-file with-output-to-file))
+          ((cxr) '(caaaar caaadr caaar caadar caaddr caadr
+                   cadaar cadadr cadar caddar cadddr caddr
+                   cdaaar cdaadr cdaar cdadar cdaddr cdadr
+                   cddaar cddadr cddar cdddar cddddr cdddr))
           (else '()))))
 
     (define (import-declaration->import-identifiers declaration)
@@ -55,7 +59,8 @@
                   (eq? (car import-declaration) 'prefix)
                   (eq? (car import-declaration) 'rename)))
          (if (and (or (equal? import-declaration '(scheme write))
-                      (equal? import-declaration '(scheme file)))
+                      (equal? import-declaration '(scheme file))
+                      (equal? import-declaration '(scheme cxr)))
                  (not (any-used-identifiers?  import-declaration used-identifiers)))
            (list
              (w/make-code-warning-with-suggestion
