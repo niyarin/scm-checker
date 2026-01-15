@@ -11,6 +11,9 @@
         (error "Error.")
         (case (cadr library-name)
           ((write) '(write display write-shared write-simple))
+          ((file) '(call-with-input-file call-with-output-file delete-file
+                    file-exists?  open-binary-input-file open-binary-output-file
+                    open-input-file open-output-file with-input-from-file with-output-to-file))
           (else '()))))
 
     (define (import-declaration->import-identifiers declaration)
@@ -51,8 +54,8 @@
         ((not (or (eq? (car import-declaration) 'except)
                   (eq? (car import-declaration) 'prefix)
                   (eq? (car import-declaration) 'rename)))
-         (if (and (equal? import-declaration
-                          '(scheme write))
+         (if (and (or (equal? import-declaration '(scheme write))
+                      (equal? import-declaration '(scheme file)))
                  (not (any-used-identifiers?  import-declaration used-identifiers)))
            (list
              (w/make-code-warning-with-suggestion
