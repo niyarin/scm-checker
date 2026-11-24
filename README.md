@@ -5,7 +5,7 @@ Linter for (R7RS, R5RS, partially R6RS) Scheme.
 
 ```bash
 # Download the binary that matches your architecture and operating system.
-wget https://github.com/niyarin/scm-checker/releases/download/0.1.7/scm-checker-0.1.7-linux-x86_64 -O scm-checker
+wget https://github.com/niyarin/scm-checker/releases/download/0.1.9/scm-checker-0.1.9-linux-x86_64 -O scm-checker
 chmod +x scm-checker
 
 # --long-output is optional.
